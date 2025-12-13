@@ -11,6 +11,7 @@ import { MetricsDashboard } from '../components/MetricsDashboard';
 import { CodeShowcase } from '../components/CodeShowcase';
 import { DevOpsPipeline } from '../components/DevOpsPipeline';
 import { LiveTerminal } from '../components/LiveTerminal';
+import { BuildWithMe } from '../components/BuildWithMe';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -207,6 +208,9 @@ const HomePage = () => {
 
       {/* Live Terminal Section */}
       <LiveTerminal />
+
+      {/* Build with Me Section */}
+      <BuildWithMe />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-slate-900/50">
