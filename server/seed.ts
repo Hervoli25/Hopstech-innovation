@@ -1,0 +1,313 @@
+import { getDb } from "./db";
+import { projects, services, blogPosts, testimonials } from "../drizzle/schema";
+
+async function seed() {
+  console.log("🌱 Seeding database...");
+
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database connection not available");
+  }
+
+  try {
+    // Seed Projects
+    console.log("📦 Seeding projects...");
+    await db.insert(projects).values([
+      {
+        title: "Talaria - Fleet Management System",
+        slug: "talaria-fleet-management",
+        description: "Advanced fleet management and logistics optimization platform",
+        longDescription: `Talaria is a comprehensive fleet management system designed to optimize logistics operations, reduce costs, and improve delivery efficiency. The platform provides real-time tracking, route optimization, and predictive maintenance capabilities.
+        
+        **Challenge:** The client was facing significant operational inefficiencies with their traditional fleet management approach, leading to high fuel costs and delayed deliveries.
+        
+        **Solution:** We developed a cloud-native platform using microservices architecture, implementing real-time GPS tracking, AI-powered route optimization, and predictive maintenance algorithms.
+        
+        **Results:** The implementation resulted in a 65% improvement in delivery efficiency, 40% reduction in operational costs, and 99.9% system uptime.`,
+        thumbnail: "/images/projects/talaria-thumbnail.jpg",
+        images: [
+          "/images/projects/talaria-1.jpg",
+          "/images/projects/talaria-2.jpg",
+          "/images/projects/talaria-3.jpg"
+        ] as any,
+        technologies: [
+          "React",
+          "Node.js",
+          "PostgreSQL",
+          "Docker",
+          "Kubernetes",
+          "AWS",
+          "Redis",
+          "GraphQL"
+        ] as any,
+        category: "Full-Stack Development",
+        client: "Logistics Corp",
+        url: "https://talaria-demo.example.com",
+        githubUrl: "https://github.com/hopstech/talaria",
+        featured: true,
+        order: 1,
+        metrics: {
+          "Performance Improvement": "65%",
+          "Cost Reduction": "40%",
+          "System Uptime": "99.9%",
+          "User Satisfaction": "4.8/5"
+        } as any,
+        publishedAt: new Date("2024-01-15")
+      },
+      {
+        title: "Talos - CI/CD Pipeline Automation",
+        slug: "talos-cicd-automation",
+        description: "Enterprise-grade CI/CD pipeline automation and DevOps orchestration platform",
+        longDescription: `Talos is an enterprise CI/CD platform that automates the entire software delivery lifecycle, from code commit to production deployment. It integrates seamlessly with existing tools and provides comprehensive monitoring and rollback capabilities.
+        
+        **Challenge:** The organization was struggling with manual deployment processes, leading to frequent errors and slow release cycles.
+        
+        **Solution:** We built an automated CI/CD platform with multi-cloud support, automated testing, security scanning, and one-click rollback functionality.
+        
+        **Results:** Deployment time reduced from hours to minutes, with zero-downtime deployments and 50% reduction in production incidents.`,
+        thumbnail: "/images/projects/talos-thumbnail.jpg",
+        images: [
+          "/images/projects/talos-1.jpg",
+          "/images/projects/talos-2.jpg"
+        ] as any,
+        technologies: [
+          "Jenkins",
+          "Docker",
+          "Kubernetes",
+          "Terraform",
+          "Ansible",
+          "Python",
+          "GitLab",
+          "Prometheus"
+        ] as any,
+        category: "DevOps",
+        client: "Tech Enterprise Inc",
+        url: "https://talos-demo.example.com",
+        featured: true,
+        order: 2,
+        metrics: {
+          "Deployment Speed": "10x faster",
+          "Incident Reduction": "50%",
+          "Automation Rate": "95%",
+          "Developer Satisfaction": "4.9/5"
+        } as any,
+        publishedAt: new Date("2024-03-20")
+      },
+      {
+        title: "Ekhaya - Property Management Platform",
+        slug: "ekhaya-property-management",
+        description: "Modern property management and tenant communication platform",
+        longDescription: `Ekhaya is a comprehensive property management solution that streamlines operations for property managers, landlords, and tenants. The platform includes rent collection, maintenance tracking, and automated communication features.
+        
+        **Challenge:** Property managers were using multiple disconnected tools, leading to communication gaps and operational inefficiencies.
+        
+        **Solution:** We created an all-in-one platform with integrated payment processing, automated notifications, maintenance request tracking, and tenant portals.
+        
+        **Results:** 80% reduction in administrative time, 95% on-time rent collection rate, and significantly improved tenant satisfaction.`,
+        thumbnail: "/images/projects/ekhaya-thumbnail.jpg",
+        images: [
+          "/images/projects/ekhaya-1.jpg",
+          "/images/projects/ekhaya-2.jpg",
+          "/images/projects/ekhaya-3.jpg"
+        ] as any,
+        technologies: [
+          "Next.js",
+          "TypeScript",
+          "Prisma",
+          "PostgreSQL",
+          "Stripe",
+          "Tailwind CSS",
+          "Vercel"
+        ] as any,
+        category: "Full-Stack Development",
+        client: "Property Solutions Ltd",
+        url: "https://ekhaya-demo.example.com",
+        featured: true,
+        order: 3,
+        metrics: {
+          "Admin Time Saved": "80%",
+          "Rent Collection Rate": "95%",
+          "Tenant Satisfaction": "4.7/5",
+          "Response Time": "2 hours avg"
+        } as any,
+        publishedAt: new Date("2024-06-10")
+      }
+    ]);
+
+    // Seed Services
+    console.log("🛠️  Seeding services...");
+    await db.insert(services).values([
+      {
+        title: "DevOps Engineering",
+        slug: "devops-engineering",
+        description: "End-to-end DevOps solutions including CI/CD pipelines, infrastructure automation, and cloud optimization",
+        icon: "DevOps",
+        features: [
+          "CI/CD Pipeline Setup & Optimization",
+          "Infrastructure as Code (Terraform, Ansible)",
+          "Container Orchestration (Docker, Kubernetes)",
+          "Cloud Migration & Optimization (AWS, GCP, Azure)",
+          "Monitoring & Logging Solutions",
+          "Security & Compliance Automation",
+          "Performance Optimization",
+          "24/7 Support & Maintenance"
+        ] as any,
+        pricing: {
+          type: "custom",
+          starting: "Contact for quote",
+          description: "Pricing varies based on project scope and requirements"
+        } as any,
+        order: 1,
+        active: true
+      },
+      {
+        title: "Full-Stack Development",
+        slug: "full-stack-development",
+        description: "Modern web applications built with React, Next.js, Node.js, and cutting-edge technologies",
+        icon: "Code",
+        features: [
+          "Custom Web Application Development",
+          "Progressive Web Apps (PWA)",
+          "API Development & Integration",
+          "Database Design & Optimization",
+          "Real-time Features (WebSockets)",
+          "Payment Integration (Stripe, PayPal)",
+          "Third-party API Integration",
+          "Responsive & Mobile-First Design"
+        ] as any,
+        pricing: {
+          type: "project-based",
+          starting: "€5,000",
+          description: "Project-based pricing with flexible payment terms"
+        } as any,
+        order: 2,
+        active: true
+      },
+      {
+        title: "Cloud Architecture",
+        slug: "cloud-architecture",
+        description: "Scalable cloud infrastructure design and implementation for modern applications",
+        icon: "Cloud",
+        features: [
+          "Cloud Strategy & Consulting",
+          "Multi-Cloud Architecture Design",
+          "Serverless Application Development",
+          "Microservices Architecture",
+          "Auto-scaling & Load Balancing",
+          "Disaster Recovery Planning",
+          "Cost Optimization",
+          "Security Best Practices"
+        ] as any,
+        pricing: {
+          type: "consulting",
+          starting: "€150/hour",
+          description: "Hourly consulting or fixed-price projects available"
+        } as any,
+        order: 3,
+        active: true
+      }
+    ]);
+
+    // Seed Blog Posts
+    console.log("📝 Seeding blog posts...");
+    await db.insert(blogPosts).values([
+      {
+        title: "Building Scalable Microservices with Kubernetes",
+        slug: "building-scalable-microservices-kubernetes",
+        excerpt: "Learn how to design, deploy, and manage microservices at scale using Kubernetes orchestration",
+        content: `# Building Scalable Microservices with Kubernetes
+
+Microservices architecture has become the de facto standard for building modern, scalable applications. In this comprehensive guide, we'll explore how to leverage Kubernetes to orchestrate and manage microservices at scale.
+
+## Why Microservices?
+
+Microservices offer several advantages over monolithic architectures:
+- **Scalability**: Scale individual services independently
+- **Flexibility**: Use different technologies for different services
+- **Resilience**: Failure in one service doesn't bring down the entire system
+- **Faster Development**: Teams can work on services independently
+
+## Kubernetes Fundamentals
+
+Kubernetes provides the infrastructure needed to run microservices effectively...
+
+[Content continues...]`,
+        thumbnail: "/images/blog/kubernetes-microservices.jpg",
+        author: "Herve Kajingu",
+        tags: ["Kubernetes", "Microservices", "DevOps", "Cloud"] as any,
+        published: true,
+        views: 1250,
+        readTime: 12,
+        publishedAt: new Date("2024-11-15")
+      },
+      {
+        title: "CI/CD Best Practices for Modern DevOps",
+        slug: "cicd-best-practices-modern-devops",
+        excerpt: "Essential CI/CD practices every DevOps engineer should implement for efficient software delivery",
+        content: `# CI/CD Best Practices for Modern DevOps
+
+Continuous Integration and Continuous Deployment (CI/CD) are fundamental to modern software development...
+
+[Content continues...]`,
+        thumbnail: "/images/blog/cicd-best-practices.jpg",
+        author: "Herve Kajingu",
+        tags: ["CI/CD", "DevOps", "Automation", "Best Practices"] as any,
+        published: true,
+        views: 980,
+        readTime: 8,
+        publishedAt: new Date("2024-10-20")
+      }
+    ]);
+
+    // Seed Testimonials
+    console.log("💬 Seeding testimonials...");
+    await db.insert(testimonials).values([
+      {
+        name: "Sarah Johnson",
+        role: "CTO",
+        company: "Logistics Corp",
+        content: "Herve transformed our entire infrastructure. The Talaria platform has revolutionized our fleet management operations. His expertise in DevOps and cloud architecture is unmatched.",
+        avatar: "/images/testimonials/sarah-johnson.jpg",
+        rating: 5,
+        featured: true,
+        approved: true
+      },
+      {
+        name: "Michael Chen",
+        role: "VP of Engineering",
+        company: "Tech Enterprise Inc",
+        content: "Working with Herve on our CI/CD pipeline was a game-changer. The Talos platform reduced our deployment time by 90% and significantly improved our development workflow.",
+        avatar: "/images/testimonials/michael-chen.jpg",
+        rating: 5,
+        featured: true,
+        approved: true
+      },
+      {
+        name: "Emma Williams",
+        role: "Product Manager",
+        company: "Property Solutions Ltd",
+        content: "The Ekhaya platform exceeded all our expectations. Herve's attention to detail and technical expertise resulted in a product that our clients absolutely love.",
+        avatar: "/images/testimonials/emma-williams.jpg",
+        rating: 5,
+        featured: true,
+        approved: true
+      }
+    ]);
+
+    console.log("✅ Database seeded successfully!");
+  } catch (error) {
+    console.error("❌ Error seeding database:", error);
+    throw error;
+  }
+}
+
+// Run seed function
+seed()
+  .then(() => {
+    console.log("🎉 Seeding completed!");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("Failed to seed database:", error);
+    process.exit(1);
+  });

@@ -1,0 +1,9 @@
+{
+  "query": "DROP TABLE IF EXISTS analytics;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2b9g2tHVMXjWkq1.25a368e88ee3 --database 5iTqsYbFebvYWNrLzga8Qu --execute DROP TABLE IF EXISTS analytics;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 471
+}
