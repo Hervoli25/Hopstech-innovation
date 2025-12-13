@@ -9,6 +9,7 @@ import { trpc } from '../lib/trpc';
 import SkillsSection from '../components/SkillsSection';
 import { MetricsDashboard } from '../components/MetricsDashboard';
 import { CodeShowcase } from '../components/CodeShowcase';
+import { DevOpsPipeline } from '../components/DevOpsPipeline';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -199,6 +200,9 @@ const HomePage = () => {
 
       {/* Code Showcase Section */}
       <CodeShowcase />
+
+      {/* DevOps Pipeline Section */}
+      <DevOpsPipeline />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-slate-900/50">
