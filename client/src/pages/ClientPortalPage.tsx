@@ -119,7 +119,7 @@ const ClientPortalPage = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Your gateway to seamless project collaboration, real-time progress tracking, and direct communication with our expert team.
+              Whether you're a business, startup, freelancer, or individual - your gateway to seamless project collaboration and expert DevOps solutions.
             </p>
           </div>
         </div>
@@ -159,10 +159,10 @@ const ClientPortalPage = () => {
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Existing Client?
+                Access Your Dashboard
               </h2>
               <p className="text-gray-400 text-lg">
-                Sign in to access your project dashboard
+                Sign in or create an account - no password needed!
               </p>
             </div>
 
@@ -170,10 +170,10 @@ const ClientPortalPage = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <LogIn className="h-5 w-5 text-blue-400" />
-                  Sign In with Magic Link
+                  Passwordless Sign In
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  We'll send you a secure link to sign in - no password needed!
+                  Enter your email and we'll send you a secure link. New users will automatically get an account!
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -237,10 +237,10 @@ const ClientPortalPage = () => {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                New Client? Start Your Project
+                Start a New Project
               </h2>
               <p className="text-gray-400 text-lg">
-                Tell us about your project and we'll get back to you within 24 hours
+                Whether you're a business, individual, or seasonal client - tell us about your project and we'll get back to you within 24 hours
               </p>
             </div>
 
@@ -293,7 +293,7 @@ const ClientPortalPage = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="company" className="text-white">
-                        Company Name
+                        Company Name <span className="text-gray-500 text-sm">(Optional)</span>
                       </Label>
                       <div className="relative">
                         <Input
@@ -302,7 +302,7 @@ const ClientPortalPage = () => {
                           value={formData.company}
                           onChange={handleChange}
                           className="bg-slate-900 border-slate-700 text-white pl-10"
-                          placeholder="Your Company"
+                          placeholder="Your Company or leave blank"
                         />
                         <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
