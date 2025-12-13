@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { trpc } from '../lib/trpc';
 import SkillsSection from '../components/SkillsSection';
+import { MetricsDashboard } from '../components/MetricsDashboard';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -80,6 +81,9 @@ const HomePage = () => {
 
       {/* Skills Section */}
       <SkillsSection />
+
+      {/* Metrics Dashboard */}
+      <MetricsDashboard />
 
       {/* Services Section */}
       <section className="py-20 bg-slate-900/50">
