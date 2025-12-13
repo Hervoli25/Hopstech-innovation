@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/badge';
 import { trpc } from '../lib/trpc';
 import SkillsSection from '../components/SkillsSection';
 import { MetricsDashboard } from '../components/MetricsDashboard';
+import { CodeShowcase } from '../components/CodeShowcase';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -195,6 +196,9 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Code Showcase Section */}
+      <CodeShowcase />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-slate-900/50">
