@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Rocket, CheckCircle2, Clock, TrendingUp, Mail, Building2, Phone, FileText } from 'lucide-react';
+import { Rocket, CheckCircle2, Clock, TrendingUp, Mail, Building2, Phone, FileText, LogIn } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -22,6 +22,9 @@ const ClientPortalPage = () => {
     description: '',
   });
 
+  const [magicLinkEmail, setMagicLinkEmail] = useState('');
+  const [magicLinkName, setMagicLinkName] = useState('');
+
   const inquiryMutation = trpc.clientPortal.submitInquiry.useMutation({
     onSuccess: () => {
       toast.success('Project inquiry submitted! Check your email for next steps.');
@@ -41,6 +44,17 @@ const ClientPortalPage = () => {
     },
   });
 
+  const magicLinkMutation = trpc.magicLink.requestMagicLink.useMutation({
+    onSuccess: () => {
+      toast.success('Magic link sent! Check your email to sign in.');
+      setMagicLinkEmail('');
+      setMagicLinkName('');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to send magic link. Please try again.');
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     inquiryMutation.mutate(formData);
@@ -48,6 +62,11 @@ const ClientPortalPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleMagicLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    magicLinkMutation.mutate({ email: magicLinkEmail, name: magicLinkName });
   };
 
   const features = [
@@ -134,13 +153,91 @@ const ClientPortalPage = () => {
         </div>
       </section>
 
+      {/* Client Login Section */}
+      <section className="py-20 bg-slate-900/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Existing Client?
+              </h2>
+              <p className="text-gray-400 text-lg">
+                Sign in to access your project dashboard
+              </p>
+            </div>
+
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <LogIn className="h-5 w-5 text-blue-400" />
+                  Sign In with Magic Link
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  We'll send you a secure link to sign in - no password needed!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="magicLinkName" className="text-white">
+                      Your Name
+                    </Label>
+                    <Input
+                      id="magicLinkName"
+                      type="text"
+                      value={magicLinkName}
+                      onChange={(e) => setMagicLinkName(e.target.value)}
+                      className="bg-slate-900 border-slate-700 text-white"
+                      placeholder="John Doe"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="magicLinkEmail" className="text-white">
+                      Email Address <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="magicLinkEmail"
+                      type="email"
+                      value={magicLinkEmail}
+                      onChange={(e) => setMagicLinkEmail(e.target.value)}
+                      required
+                      className="bg-slate-900 border-slate-700 text-white"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    disabled={magicLinkMutation.isPending}
+                  >
+                    {magicLinkMutation.isPending ? (
+                      <>
+                        <span className="animate-spin mr-2">⏳</span>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Send Magic Link
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Project Inquiry Form Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Start Your Project
+                New Client? Start Your Project
               </h2>
               <p className="text-gray-400 text-lg">
                 Tell us about your project and we'll get back to you within 24 hours

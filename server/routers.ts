@@ -7,6 +7,7 @@ import { serviceRouter } from "./serviceRouter";
 import { testimonialRouter } from "./testimonialRouter";
 import { contactRouter } from "./contactRouter";
 import { clientPortalRouter } from "./clientPortalRouter";
+import { magicLinkRouter } from "./magicLinkRouter";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -28,6 +29,7 @@ export const appRouter = router({
   testimonials: testimonialRouter,
   contact: contactRouter,
   clientPortal: clientPortalRouter,
+  magicLink: magicLinkRouter,
 });
 
 export type AppRouter = typeof appRouter;
