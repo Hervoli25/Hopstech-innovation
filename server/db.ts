@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq, and, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, magicLinks, InsertMagicLink } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,6 +89,62 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createMagicLink(data: InsertMagicLink) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(magicLinks).values(data).returning();
+  return result[0];
+}
+
+export async function getMagicLinkByToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get magic link: database not available");
+    return undefined;
+  }
+
+  const result = await db
+    .select()
+    .from(magicLinks)
+    .where(
+      and(
+        eq(magicLinks.token, token),
+        eq(magicLinks.status, "pending"),
+        gt(magicLinks.expiresAt, new Date())
+      )
+    )
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function markMagicLinkAsUsed(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(magicLinks)
+    .set({ status: "used", usedAt: new Date() })
+    .where(eq(magicLinks.token, token));
 }
 
 // TODO: add feature queries here as your schema grows.

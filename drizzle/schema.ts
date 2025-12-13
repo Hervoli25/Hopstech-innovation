@@ -220,3 +220,108 @@ export const analytics = pgTable("analytics", {
 
 export type Analytics = typeof analytics.$inferSelect;
 export type InsertAnalytics = typeof analytics.$inferInsert;
+
+/**
+ * Magic Links table - for passwordless authentication
+ */
+export const magicLinks = pgTable("magicLinks", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 320 }).notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  status: magicLinkStatusEnum("status").default("pending").notNull(),
+  expiresAt: timestamp("expiresAt", { mode: "date", withTimezone: true }).notNull(),
+  usedAt: timestamp("usedAt", { mode: "date", withTimezone: true }),
+  ip: varchar("ip", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  tokenIdx: uniqueIndex("magic_links_token_idx").on(table.token),
+  emailIdx: index("magic_links_email_idx").on(table.email),
+  statusIdx: index("magic_links_status_idx").on(table.status),
+  expiresAtIdx: index("magic_links_expires_at_idx").on(table.expiresAt),
+}));
+
+export type MagicLink = typeof magicLinks.$inferSelect;
+export type InsertMagicLink = typeof magicLinks.$inferInsert;
+
+/**
+ * Client Projects table - links clients (users) to their projects
+ */
+export const clientProjects = pgTable("clientProjects", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: integer("projectId").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 100 }).default("client").notNull(), // client, collaborator, viewer
+  accessGrantedAt: timestamp("accessGrantedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  accessGrantedBy: integer("accessGrantedBy").references(() => users.id),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("client_projects_user_id_idx").on(table.userId),
+  projectIdIdx: index("client_projects_project_id_idx").on(table.projectId),
+  uniqueUserProject: uniqueIndex("client_projects_user_project_idx").on(table.userId, table.projectId),
+}));
+
+export type ClientProject = typeof clientProjects.$inferSelect;
+export type InsertClientProject = typeof clientProjects.$inferInsert;
+
+/**
+ * Project Inquiries table - stores new project requests from landing page
+ */
+export const projectInquiries = pgTable("projectInquiries", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  company: varchar("company", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  projectType: varchar("projectType", { length: 100 }).notNull(), // web-app, mobile-app, devops, consulting, etc.
+  budget: varchar("budget", { length: 100 }),
+  timeline: varchar("timeline", { length: 100 }),
+  description: text("description").notNull(),
+  requirements: jsonb("requirements").$type<string[]>().default([]),
+  status: projectInquiryStatusEnum("status").default("new").notNull(),
+  assignedTo: integer("assignedTo").references(() => users.id),
+  notes: text("notes"),
+  ip: varchar("ip", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  reviewedAt: timestamp("reviewedAt", { mode: "date", withTimezone: true }),
+}, (table) => ({
+  emailIdx: index("project_inquiries_email_idx").on(table.email),
+  statusIdx: index("project_inquiries_status_idx").on(table.status),
+  createdAtIdx: index("project_inquiries_created_at_idx").on(table.createdAt),
+  projectTypeIdx: index("project_inquiries_project_type_idx").on(table.projectType),
+}));
+
+export type ProjectInquiry = typeof projectInquiries.$inferSelect;
+export type InsertProjectInquiry = typeof projectInquiries.$inferInsert;
+
+/**
+ * Project Updates table - admin posts updates that clients can view
+ */
+export const projectUpdates = pgTable("projectUpdates", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  authorId: integer("authorId").notNull().references(() => users.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  type: varchar("type", { length: 50 }).default("general").notNull(), // general, milestone, issue, release
+  visibility: varchar("visibility", { length: 50 }).default("clients").notNull(), // clients, public, private
+  attachments: jsonb("attachments").$type<string[]>().default([]),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  published: boolean("published").default(true).notNull(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  publishedAt: timestamp("publishedAt", { mode: "date", withTimezone: true }),
+}, (table) => ({
+  projectIdIdx: index("project_updates_project_id_idx").on(table.projectId),
+  authorIdIdx: index("project_updates_author_id_idx").on(table.authorId),
+  typeIdx: index("project_updates_type_idx").on(table.type),
+  publishedIdx: index("project_updates_published_idx").on(table.published),
+  publishedAtIdx: index("project_updates_published_at_idx").on(table.publishedAt),
+}));
+
+export type ProjectUpdate = typeof projectUpdates.$inferSelect;
+export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;

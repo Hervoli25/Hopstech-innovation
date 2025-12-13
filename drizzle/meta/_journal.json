@@ -8,6 +8,13 @@
       "when": 1765620693470,
       "tag": "0000_colossal_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765624320035,
+      "tag": "0001_mean_firebird",
+      "breakpoints": true
     }
   ]
 }
