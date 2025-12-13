@@ -10,6 +10,7 @@ import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ContactPage from "./pages/ContactPage";
 import ClientPortalPage from "./pages/ClientPortalPage";
 import AuthVerifyPage from "./pages/AuthVerifyPage";
+import { ScrollProgress } from "./components/animations/ScrollProgress";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function App() {
         // switchable
       >
         <TooltipProvider>
+          <ScrollProgress />
           <Toaster />
           <Router />
         </TooltipProvider>
