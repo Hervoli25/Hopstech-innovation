@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ContactPage from "./pages/ContactPage";
+import ClientPortalPage from "./pages/ClientPortalPage";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path={"/portfolio"} component={PortfolioPage} />
       <Route path={"/portfolio/:slug"} component={ProjectDetailPage} />
       <Route path={"/contact"} component={ContactPage} />
+      <Route path={"/client-portal"} component={ClientPortalPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
