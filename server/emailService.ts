@@ -19,7 +19,7 @@ const createTransporter = () => {
     return null;
   }
 
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: emailHost,
     port: emailPort,
     secure: false, // true for 465, false for other ports
