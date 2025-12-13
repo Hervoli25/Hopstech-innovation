@@ -10,6 +10,7 @@ import SkillsSection from '../components/SkillsSection';
 import { MetricsDashboard } from '../components/MetricsDashboard';
 import { CodeShowcase } from '../components/CodeShowcase';
 import { DevOpsPipeline } from '../components/DevOpsPipeline';
+import { LiveTerminal } from '../components/LiveTerminal';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -203,6 +204,9 @@ const HomePage = () => {
 
       {/* DevOps Pipeline Section */}
       <DevOpsPipeline />
+
+      {/* Live Terminal Section */}
+      <LiveTerminal />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-slate-900/50">
