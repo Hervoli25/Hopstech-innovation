@@ -13,6 +13,7 @@ import { DevOpsPipeline } from '../components/DevOpsPipeline';
 import { LiveTerminal } from '../components/LiveTerminal';
 import { BuildWithMe } from '../components/BuildWithMe';
 import { ProjectStory } from '../components/ProjectStory';
+import { TechConstellation } from '../components/TechConstellation';
 
 const HomePage = () => {
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getFeatured.useQuery();
@@ -215,6 +216,9 @@ const HomePage = () => {
 
       {/* Project Story Section */}
       <ProjectStory />
+
+      {/* Tech Constellation Section */}
+      <TechConstellation />
 
       {/* Testimonials Section */}
       <section className="py-20 bg-slate-900/50">
