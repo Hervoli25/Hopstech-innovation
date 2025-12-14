@@ -1,119 +1,276 @@
-# HOPSTECH Portfolio Website
+# HOPSTECH INNOVATION Portfolio & Client Portal
 
-A cutting-edge portfolio website showcasing DevOps engineering expertise and software development projects for **Herve Kajingu**.
+A cutting-edge portfolio website and comprehensive client portal platform showcasing DevOps engineering expertise and software development services. Built by **Herve Kajingu**, this platform combines a professional portfolio showcase with a feature-rich client management system.
 
 ![HOPSTECH Portfolio](https://img.shields.io/badge/Status-Production%20Ready-success)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
-![React](https://img.shields.io/badge/React-18.x-61dafb)
-![Vite](https://img.shields.io/badge/Vite-7.x-646cff)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![React](https://img.shields.io/badge/React-19.2-61dafb)
+![Vite](https://img.shields.io/badge/Vite-7.1-646cff)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791)
+![PWA](https://img.shields.io/badge/PWA-Enabled-5A0FC8)
 
-## 🌟 Features
+## 📖 Overview
 
-### Core Functionality
-- **Dynamic Portfolio Showcase** - Display projects with filtering, search, and detailed views
-- **Service Offerings** - Highlight DevOps, Full-Stack Development, and Cloud Architecture services
-- **Client Testimonials** - Build trust with social proof from satisfied clients
-- **Contact Form** - Integrated contact system with email notifications
-- **Responsive Design** - Optimized for mobile, tablet, and desktop devices
+HOPSTECH INNOVATION is a hybrid B2B + B2C platform that serves dual purposes:
+
+1. **Portfolio Website** - Showcase DevOps and software development expertise, projects, and services
+2. **Client Portal** - Full-featured client management system with project tracking, messaging, invoicing, and support
+
+This platform demonstrates modern web development best practices, cutting-edge technologies, and exceptional user experience design.
+
+## ✨ Key Features
+
+### 🎯 Portfolio Website
+- **Dynamic Project Showcase** - Filterable portfolio with detailed project views
+- **Service Offerings** - Comprehensive DevOps, Full-Stack Development, and Cloud Architecture services
+- **Client Testimonials** - Social proof from satisfied clients
+- **Contact System** - Integrated contact form with email notifications
+- **Responsive Design** - Optimized for all devices (mobile, tablet, desktop)
 - **Dark Theme** - Sophisticated navy blue color scheme with gradient effects
+- **SEO Optimized** - Meta tags, semantic HTML, and performance optimization
 
-### Technical Highlights
-- **Type-Safe APIs** - End-to-end type safety with tRPC
-- **Database Integration** - Neon PostgreSQL with Drizzle ORM
-- **Modern UI Components** - Shadcn/ui with Tailwind CSS
-- **SEO Optimized** - Meta tags and semantic HTML
-- **Performance Focused** - Fast loading with Vite bundling
-- **Smooth Animations** - Professional transitions and hover effects
-- **Serverless Ready** - Optimized for Vercel deployment
+### 🚀 Client Portal (Advanced Features)
+
+#### 1. **Smart Notification Center**
+- Real-time notification system with unread badge
+- Priority-based color coding (urgent, high, medium, low)
+- Notification grouping and categorization
+- Actionable notifications with direct links
+- Snooze functionality for better workflow management
+- Desktop notifications via Web Notifications API
+- Granular notification preferences
+
+#### 2. **Interactive Project Timeline**
+- Visual Gantt chart for project milestones
+- Color-coded milestone status (completed, on track, due soon, overdue)
+- Interactive milestone completion with confetti celebrations
+- Timeline and list view toggle
+- Real-time progress tracking
+- Milestone management and updates
+
+#### 3. **AI-Powered Project Insights**
+- Project health score algorithm (0-100 with A-F grading)
+- Predictive completion date based on velocity
+- Budget burn rate analysis
+- Risk detection system (overdue milestones, budget overruns, low activity)
+- Intelligent recommendations and alerts
+- Visual insights dashboard
+
+#### 4. **Progressive Web App (PWA)**
+- Installable as native app on desktop and mobile
+- Offline mode with service worker caching
+- Custom install prompts
+- Update notifications
+- Offline indicator
+- App-like experience with HOPSTECH branding
+
+#### 5. **Comprehensive Loading States**
+- Skeleton screens for all major components
+- HOPSTECH-branded loading spinners with gradient effects
+- Full-screen loader for initial app load
+- Button loading states for form submissions
+- Smooth transitions between loading and loaded states
+- Accessible loading indicators (ARIA labels)
+
+#### 6. **Additional Portal Features**
+- **Magic Link Authentication** - Passwordless email-based login with JWT sessions
+- **Project Management** - Create, track, and manage client projects
+- **Messaging System** - Two-column messaging interface with conversation threads
+- **Invoice Management** - View invoices, track payments, download PDFs
+- **Support Tickets** - Create and manage support tickets with threaded conversations
+- **User Profile** - Manage profile information and notification preferences
+- **Activity Tracking** - Comprehensive activity log for all user actions
+- **File Management** - Upload and manage project files
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **React 19.2** - Latest React with concurrent features
+- **TypeScript 5.9** - Type-safe development
+- **Vite 7.1** - Lightning-fast build tool
+- **Wouter 3.3** - Lightweight routing
+- **Tailwind CSS 4.1** - Utility-first CSS framework
+- **Shadcn/ui** - High-quality React components
+- **Framer Motion 12.23** - Advanced animations
+- **Three.js** - 3D graphics and visualizations
+- **Canvas Confetti** - Celebration animations
+
+### Backend
+- **Express 4.21** - Web application framework
+- **tRPC** - End-to-end type-safe APIs
+- **Drizzle ORM** - Type-safe database toolkit
+- **PostgreSQL (Neon)** - Serverless PostgreSQL database
+- **JWT** - Secure session management
+- **Nodemailer** - Email service integration
+
+### PWA & Performance
+- **Vite PWA Plugin** - Progressive Web App support
+- **Workbox** - Service worker and caching strategies
+- **Sharp** - High-performance image processing
+- **Web Notifications API** - Desktop notifications
+
+### Development Tools
+- **ESLint** - Code linting
+- **TypeScript Compiler** - Type checking
+- **Drizzle Kit** - Database migrations
+- **Git** - Version control
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- npm (or pnpm)
-- Neon PostgreSQL database (free tier available at [neon.tech](https://neon.tech))
+
+- **Node.js 18+** - JavaScript runtime
+- **npm or pnpm** - Package manager
+- **Neon PostgreSQL** - Serverless database (free tier available at [neon.tech](https://neon.tech))
+- **Git** - Version control
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd hopstech-portfolio
    ```
 
 2. **Install dependencies**
+
    ```bash
+   npm install --legacy-peer-deps
+   # or
    pnpm install
    ```
 
 3. **Configure environment variables**
 
-   Create a `.env` file in the root directory (or copy from `.env.example`):
+   Create a `.env` file in the root directory:
+
    ```env
    # Database - Neon PostgreSQL
    DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
 
-   # Email (Optional - for contact form)
+   # JWT Secret for Authentication
+   JWT_SECRET="your-secure-random-secret-key"
+
+   # Email Configuration (for contact form and magic links)
    EMAIL_USER="your-email@domain.com"
    EMAIL_PASS="your-app-specific-password"
    EMAIL_HOST="smtp.zoho.eu"
    EMAIL_PORT="587"
 
-   # Application
+   # Application Settings
    VITE_APP_TITLE="HOPSTECH INNOVATION"
    VITE_APP_LOGO="/logo.png"
+   NODE_ENV="development"
    ```
 
 4. **Set up the database**
+
    ```bash
-   # Generate and apply migrations to Neon PostgreSQL
+   # Push schema to Neon PostgreSQL
    npm run db:push
 
    # Seed with sample data (optional)
    npm exec tsx server/seed.ts
    ```
 
-   > **Note:** This project uses Neon PostgreSQL. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions.
+5. **Generate PWA icons (optional)**
 
-5. **Start development server**
    ```bash
-   pnpm dev
+   node scripts/generate-pwa-icons.js
+   ```
+
+6. **Start development server**
+
+   ```bash
+   npm run dev
    ```
 
    The application will be available at `http://localhost:3000`
 
+### First-Time Setup
+
+After starting the dev server:
+
+1. **Access the Portfolio** - Navigate to `http://localhost:3000`
+2. **Access the Client Portal** - Navigate to `http://localhost:3000/client-portal`
+3. **Login with Magic Link** - Enter your email to receive a passwordless login link
+4. **Explore Features** - Check out notifications, projects, timeline, AI insights, and more!
+
 ## 📁 Project Structure
 
-```
+```plaintext
 hopstech-portfolio/
-├── client/                 # Frontend application
+├── client/                          # Frontend application
+│   ├── public/                      # Static assets
+│   │   ├── manifest.json           # PWA manifest
+│   │   ├── pwa-icon-*.png          # PWA icons
+│   │   ├── favicon-*.png           # Rounded favicons
+│   │   └── logo.png                # HOPSTECH logo
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   │   ├── ui/       # Shadcn/ui components
+│   │   ├── components/             # React components
+│   │   │   ├── ui/                 # Shadcn/ui components
+│   │   │   │   ├── loading-spinner.tsx  # Loading components
+│   │   │   │   ├── skeletons.tsx        # Skeleton screens
+│   │   │   │   └── ...             # Other UI components
+│   │   │   ├── dashboard/          # Client portal components
+│   │   │   │   ├── DashboardLayout.tsx
+│   │   │   │   ├── NotificationCenter.tsx
+│   │   │   │   ├── CreateProjectModal.tsx
+│   │   │   │   └── ...
+│   │   │   ├── project/            # Project-specific components
+│   │   │   │   ├── ProjectTimeline.tsx
+│   │   │   │   ├── ProjectInsights.tsx
+│   │   │   │   └── ...
+│   │   │   ├── pwa/                # PWA components
+│   │   │   │   ├── PWAInstallPrompt.tsx
+│   │   │   │   ├── PWAUpdatePrompt.tsx
+│   │   │   │   └── OfflineIndicator.tsx
 │   │   │   ├── Navigation.tsx
 │   │   │   ├── Footer.tsx
 │   │   │   └── PageLayout.tsx
-│   │   ├── pages/        # Page components
+│   │   ├── pages/                  # Page components
 │   │   │   ├── HomePage.tsx
 │   │   │   ├── PortfolioPage.tsx
 │   │   │   ├── ProjectDetailPage.tsx
-│   │   │   └── ContactPage.tsx
-│   │   ├── lib/          # Utilities and configurations
-│   │   ├── App.tsx       # Main app component
-│   │   └── index.css     # Global styles
+│   │   │   ├── ContactPage.tsx
+│   │   │   ├── ClientPortalPage.tsx
+│   │   │   ├── ClientProjectDetailPage.tsx
+│   │   │   ├── ProjectsPage.tsx
+│   │   │   ├── MessagesPage.tsx
+│   │   │   ├── InvoicesPage.tsx
+│   │   │   ├── SupportPage.tsx
+│   │   │   └── ProfilePage.tsx
+│   │   ├── hooks/                  # Custom React hooks
+│   │   │   └── usePWA.ts
+│   │   ├── lib/                    # Utilities and configurations
+│   │   │   ├── trpc.ts             # tRPC client
+│   │   │   ├── projectInsights.ts  # AI insights logic
+│   │   │   ├── confetti.ts         # Confetti animations
+│   │   │   └── utils.ts
+│   │   ├── App.tsx                 # Main app component
+│   │   └── index.css               # Global styles
 │   └── index.html
-├── server/                # Backend application
-│   ├── routers.ts        # tRPC router configuration
-│   ├── projectRouter.ts  # Projects API
-│   ├── serviceRouter.ts  # Services API
-│   ├── testimonialRouter.ts  # Testimonials API
-│   ├── contactRouter.ts  # Contact form API
-│   ├── db.ts            # Database connection
-│   └── seed.ts          # Database seeding script
-├── drizzle/              # Database schema and migrations
-│   └── schema.ts        # Database schema definition
-├── shared/               # Shared types and utilities
+├── server/                          # Backend application
+│   ├── routers.ts                  # tRPC router configuration
+│   ├── projectRouter.ts            # Projects API
+│   ├── serviceRouter.ts            # Services API
+│   ├── testimonialRouter.ts        # Testimonials API
+│   ├── contactRouter.ts            # Contact form API
+│   ├── clientPortalRouter.ts       # Client portal API (25+ endpoints)
+│   ├── authRouter.ts               # Authentication API
+│   ├── auth.ts                     # JWT session management
+│   ├── email.ts                    # Email service
+│   ├── db.ts                       # Database connection
+│   └── seed.ts                     # Database seeding script
+├── drizzle/                         # Database schema and migrations
+│   ├── schema.ts                   # Database schema (20+ tables)
+│   └── seed-notifications.ts       # Notification seeding
+├── scripts/                         # Utility scripts
+│   └── generate-pwa-icons.js       # PWA icon generator
+├── shared/                          # Shared types and utilities
 │   └── portfolio-types.ts
+├── vite.config.ts                  # Vite configuration with PWA
 └── package.json
 ```
 
@@ -138,41 +295,33 @@ hopstech-portfolio/
 
 ## 🗄️ Database Schema
 
-### Projects
-- Title, description, category
-- Technologies, metrics, client info
-- Thumbnail, gallery images
-- GitHub URL, live URL
-- Featured flag, publish date
+The application uses **Neon PostgreSQL** with **Drizzle ORM** for type-safe database operations. The schema includes 20+ tables:
 
-### Services
-- Title, description, icon
-- Features list, pricing
-- Active status
+### Portfolio Tables
 
-### Testimonials
-- Client name, role, company
-- Content, rating
-- Featured flag
+- **projects** - Portfolio projects with title, description, category, technologies, metrics, images, URLs
+- **services** - Service offerings with features, pricing, and active status
+- **testimonials** - Client testimonials with name, role, company, content, rating
+- **contactSubmissions** - Contact form submissions with status tracking
+- **blogPosts** - Blog posts with title, slug, content, author, category, tags
+- **newsletterSubscriptions** - Email subscriptions with active status
+- **analytics** - Page views, unique visitors, referrer tracking
 
-### Contact Submissions
-- Name, email, company, phone
-- Subject, message
-- Status tracking, timestamps
+### Client Portal Tables
 
-### Blog Posts
-- Title, slug, content
-- Author, category, tags
-- Featured image, publish date
+- **users** - User accounts with email, authentication tokens
+- **userProfiles** - Extended user profiles with company info, phone, avatar
+- **clientProjectsExtended** - Client projects with type, priority, budget, milestones, status
+- **projectFiles** - File attachments for projects with upload tracking
+- **invoices** - Invoice management with amount, status, due dates, payment tracking
+- **supportTickets** - Support ticket system with priority, status, assignment
+- **ticketMessages** - Threaded messages for support tickets
+- **messages** - Direct messaging system between clients and staff
+- **notifications** - Notification system with priority, grouping, snoozing, action types
+- **activityLog** - Comprehensive activity tracking for all user actions
+- **notificationPreferences** - User preferences for notification channels and types
 
-### Newsletter Subscriptions
-- Email, subscription date
-- Active status
-
-### Analytics
-- Page views, unique visitors
-- Referrer tracking
-- Timestamps
+All tables include proper timestamps, foreign key relationships, and indexes for optimal performance.
 
 ## 🔧 Development
 
@@ -180,45 +329,85 @@ hopstech-portfolio/
 
 ```bash
 # Development
-pnpm dev              # Start dev server
-pnpm build           # Build for production
-pnpm preview         # Preview production build
+npm run dev              # Start dev server (http://localhost:3000)
+npm run build           # Build for production
+npm run preview         # Preview production build
 
 # Database
-pnpm db:push         # Push schema changes
-pnpm db:studio       # Open Drizzle Studio
+npm run db:push         # Push schema changes to Neon PostgreSQL
+npm run db:studio       # Open Drizzle Studio (database GUI)
 
 # Code Quality
-pnpm lint            # Run ESLint
-pnpm type-check      # Run TypeScript compiler
+npm run lint            # Run ESLint
+npm run type-check      # Run TypeScript compiler
+
+# PWA
+node scripts/generate-pwa-icons.js  # Generate PWA icons and favicons
 ```
 
-### Adding New Projects
+### Development Workflow
 
-1. **Via Database**
+1. **Start the dev server** - `npm run dev`
+2. **Make changes** - Edit files in `client/src/` or `server/`
+3. **Hot reload** - Changes are automatically reflected in the browser
+4. **Database changes** - Update `drizzle/schema.ts` and run `npm run db:push`
+5. **Test features** - Use the client portal at `/client-portal`
+
+### Adding New Features
+
+#### Add a New Page
+
+1. Create page component in `client/src/pages/`
+
    ```typescript
-   // Add to seed.ts or use Drizzle Studio
-   await db.insert(projects).values({
-     title: 'Project Name',
-     slug: 'project-name',
-     description: 'Short description',
-     longDescription: 'Detailed description',
-     category: 'DevOps',
-     technologies: ['Docker', 'Kubernetes'],
-     thumbnail: '/images/project.jpg',
-     featured: true,
-     publishedAt: new Date(),
+   // client/src/pages/NewPage.tsx
+   export default function NewPage() {
+     return <div>New Page Content</div>;
+   }
+   ```
+
+2. Add route in `client/src/App.tsx`
+
+   ```typescript
+   <Route path="/new-page" component={NewPage} />
+   ```
+
+3. Update navigation in `client/src/components/Navigation.tsx`
+
+#### Add a New tRPC Endpoint
+
+1. Create or update router in `server/`
+
+   ```typescript
+   // server/newRouter.ts
+   export const newRouter = router({
+     getData: publicProcedure.query(async () => {
+       return { data: 'example' };
+     }),
    });
    ```
 
-2. **Via API**
-   - Use tRPC mutations to create projects programmatically
-   - Implement admin panel for content management (future enhancement)
+2. Register router in `server/routers.ts`
+
+   ```typescript
+   export const appRouter = router({
+     // ... existing routers
+     new: newRouter,
+   });
+   ```
+
+3. Use in frontend
+
+   ```typescript
+   const { data } = trpc.new.getData.useQuery();
+   ```
 
 ### Customization
 
 #### Update Contact Information
+
 Edit `client/src/components/Footer.tsx`:
+
 ```typescript
 <a href="mailto:hk@hopstechinnovation.com">
   hk@hopstechinnovation.com
@@ -229,7 +418,9 @@ Edit `client/src/components/Footer.tsx`:
 ```
 
 #### Modify Theme Colors
+
 Edit `client/src/index.css`:
+
 ```css
 .dark {
   --primary: var(--color-blue-700);
@@ -238,10 +429,18 @@ Edit `client/src/index.css`:
 }
 ```
 
-#### Add New Pages
-1. Create page component in `client/src/pages/`
-2. Add route in `client/src/App.tsx`
-3. Update navigation in `client/src/components/Navigation.tsx`
+#### Customize PWA Settings
+
+Edit `client/public/manifest.json`:
+
+```json
+{
+  "name": "HOPSTECH INNOVATION",
+  "short_name": "HOPSTECH",
+  "theme_color": "#2563eb",
+  "background_color": "#0f172a"
+}
+```
 
 ## 📧 Email Configuration
 
@@ -265,25 +464,38 @@ The contact form uses SMTP to send email notifications. Configure with Zoho Mail
 
 ## 🚢 Deployment
 
-### Manus Platform (Recommended)
-The project is optimized for Manus hosting with built-in database and deployment:
+### Vercel (Recommended)
 
-1. Click **Publish** in the Manus UI
-2. Configure custom domain (optional)
-3. Set environment variables in Settings → Secrets
+The project is optimized for Vercel deployment with serverless functions and edge caching:
+
+1. **Install Vercel CLI**
+
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Configure environment variables**
+
+   Add all environment variables from `.env` to Vercel:
+   - `DATABASE_URL`
+   - `JWT_SECRET`
+   - `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_HOST`, `EMAIL_PORT`
+   - `NODE_ENV=production`
+
+3. **Deploy**
+
+   ```bash
+   vercel --prod
+   ```
+
+4. **Configure custom domain** (optional)
+   - Add domain in Vercel dashboard
+   - Update DNS records
 
 ### Alternative Platforms
 
-#### Vercel
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
 #### Netlify
+
 ```bash
 # Install Netlify CLI
 npm i -g netlify-cli
@@ -292,17 +504,53 @@ npm i -g netlify-cli
 netlify deploy --prod
 ```
 
+**Note:** Configure environment variables in Netlify dashboard under Site settings → Environment variables.
+
 #### Docker
+
+Create a `Dockerfile`:
+
 ```dockerfile
 FROM node:18-alpine
+
 WORKDIR /app
+
+# Copy package files
 COPY package*.json ./
-RUN npm install
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy application files
 COPY . .
+
+# Build application
 RUN npm run build
+
+# Expose port
 EXPOSE 3000
+
+# Start application
 CMD ["npm", "start"]
 ```
+
+Build and run:
+
+```bash
+docker build -t hopstech-portfolio .
+docker run -p 3000:3000 --env-file .env hopstech-portfolio
+```
+
+### Deployment Checklist
+
+- [ ] Set all environment variables
+- [ ] Configure Neon PostgreSQL connection string
+- [ ] Run database migrations (`npm run db:push`)
+- [ ] Test email configuration
+- [ ] Configure custom domain
+- [ ] Enable HTTPS
+- [ ] Test PWA installation
+- [ ] Verify all features work in production
 
 ## 🔐 Security
 
@@ -390,29 +638,83 @@ pnpm test:coverage
 - Twitter Card tags
 - Google Analytics integration
 
-## 📞 Contact
+## 📞 Contact & Support
 
-**Herve Kajingu**  
-DevOps Engineer & Full-Stack Developer
+### Author
 
-- **Email**: hk@hopstechinnovation.com
+**Herve Kajingu**
+Solo Developer & Owner
+HOPSTECH INNOVATION
+
+### Contact Information
+
+- **Email**: [hk@hopstechinnovation.com](mailto:hk@hopstechinnovation.com)
 - **Phone**: +33 7 76 02 66 88
 - **GitHub**: [github.com/hopstech](https://github.com/hopstech)
 - **LinkedIn**: [linkedin.com/in/herve-kajingu](https://linkedin.com/in/herve-kajingu)
+- **Website**: [hopstechinnovation.com](https://hopstechinnovation.com)
+
+### Business Inquiries
+
+For DevOps consulting, software development services, or partnership opportunities, please reach out via email or phone.
 
 ## 📄 License
 
-This project is proprietary and confidential. All rights reserved © 2024 HOPSTECH INNOVATION.
+**Copyright © 2024 HOPSTECH INNOVATION. All Rights Reserved.**
+
+This project and its contents are proprietary and confidential. Unauthorized copying, distribution, modification, or use of this software, via any medium, is strictly prohibited without explicit written permission from the copyright holder.
+
+### Proprietary License
+
+- **Owner**: Herve Kajingu
+- **Company**: HOPSTECH INNOVATION
+- **Rights**: All rights reserved
+- **Usage**: This software is for demonstration and portfolio purposes only
+- **Restrictions**: No part of this project may be reproduced, distributed, or transmitted in any form without prior written permission
+
+For licensing inquiries, please contact: hk@hopstechinnovation.com
 
 ## 🙏 Acknowledgments
 
-- Built with [Manus](https://manus.im) - AI-powered development platform
-- UI Components from [Shadcn/ui](https://ui.shadcn.com)
-- Icons from [Lucide](https://lucide.dev)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
+This project was built using the following open-source technologies and tools:
+
+### Core Technologies
+
+- **[React](https://react.dev)** - UI library
+- **[TypeScript](https://www.typescriptlang.org)** - Type-safe JavaScript
+- **[Vite](https://vitejs.dev)** - Build tool and dev server
+- **[tRPC](https://trpc.io)** - End-to-end type-safe APIs
+- **[Drizzle ORM](https://orm.drizzle.team)** - Type-safe database toolkit
+- **[Neon](https://neon.tech)** - Serverless PostgreSQL
+
+### UI & Styling
+
+- **[Shadcn/ui](https://ui.shadcn.com)** - High-quality React components
+- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first CSS framework
+- **[Lucide](https://lucide.dev)** - Beautiful icon library
+- **[Framer Motion](https://www.framer.com/motion)** - Animation library
+
+### Additional Libraries
+
+- **[Three.js](https://threejs.org)** - 3D graphics
+- **[Canvas Confetti](https://github.com/catdad/canvas-confetti)** - Celebration animations
+- **[Workbox](https://developers.google.com/web/tools/workbox)** - PWA service worker
+- **[Sharp](https://sharp.pixelplumbing.com)** - Image processing
+
+Special thanks to the open-source community for making these amazing tools available.
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: December 2024  
+## 📊 Project Information
+
+**Project Name**: HOPSTECH INNOVATION Portfolio & Client Portal
+**Version**: 2.0.0
+**Author**: Herve Kajingu
+**Company**: HOPSTECH INNOVATION
+**Last Updated**: December 2025
 **Status**: Production Ready ✅
+**License**: Proprietary - All Rights Reserved
+
+---
+
+**Built with ❤️ by Herve Kajingu**
