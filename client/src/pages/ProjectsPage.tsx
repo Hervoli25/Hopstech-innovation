@@ -11,6 +11,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { trpc } from '../lib/trpc';
 import { cn } from '../lib/utils';
 import CreateProjectModal from '../components/dashboard/CreateProjectModal';
+import { ProjectCardSkeleton } from '../components/ui/skeletons';
 
 type ProjectStatus = 'planning' | 'in_progress' | 'on_hold' | 'completed' | 'archived';
 
@@ -103,7 +104,7 @@ const ProjectsPage = () => {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Skeleton key={i} className="h-64" />
+                <ProjectCardSkeleton key={i} />
               ))}
             </div>
           ) : filteredProjects.length > 0 ? (

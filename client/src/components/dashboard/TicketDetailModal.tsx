@@ -13,6 +13,7 @@ import {
 } from '../ui/dialog';
 import { trpc } from '../../lib/trpc';
 import { toast } from 'sonner';
+import { ButtonSpinner } from '../ui/loading-spinner';
 import { cn } from '../../lib/utils';
 
 interface TicketDetailModalProps {
@@ -189,8 +190,17 @@ const TicketDetailModal = ({ ticketId, open, onOpenChange }: TicketDetailModalPr
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                   disabled={replyMutation.isPending || ticket.status === 'closed'}
                 >
-                  <Send className="h-4 w-4 mr-2" />
-                  {replyMutation.isPending ? 'Sending...' : 'Send Reply'}
+                  {replyMutation.isPending ? (
+                    <>
+                      <ButtonSpinner className="mr-2" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Reply
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

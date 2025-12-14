@@ -15,6 +15,7 @@ import { trpc } from '../../lib/trpc';
 import { Link } from 'wouter';
 import { Skeleton } from '../ui/skeleton';
 import NotificationPermissionPrompt from './NotificationPermissionPrompt';
+import { StatsCardSkeleton, ProjectCardSkeleton } from '../ui/skeletons';
 
 const DashboardOverview = () => {
   const { data: stats, isLoading: statsLoading } = trpc.clientPortal.getDashboardStats.useQuery();
@@ -81,12 +82,42 @@ const DashboardOverview = () => {
   if (statsLoading) {
     return (
       <div className="p-6 space-y-6">
-        <Skeleton className="h-32 w-full" />
+        {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-40" />
+            <StatsCardSkeleton key={i} />
           ))}
         </div>
+
+        {/* Recent Projects Skeleton */}
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <ProjectCardSkeleton key={i} />
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Activity Feed Skeleton */}
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader>
+            <Skeleton className="h-6 w-48" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-start gap-3">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     );
   }

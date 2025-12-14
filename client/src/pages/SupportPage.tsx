@@ -9,6 +9,7 @@ import { trpc } from '../lib/trpc';
 import { cn } from '../lib/utils';
 import CreateTicketModal from '../components/dashboard/CreateTicketModal';
 import TicketDetailModal from '../components/dashboard/TicketDetailModal';
+import { TicketListSkeleton } from '../components/ui/skeletons';
 
 type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
@@ -105,11 +106,7 @@ const SupportPage = () => {
 
           {/* Tickets List */}
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
+            <TicketListSkeleton />
           ) : tickets && tickets.length > 0 ? (
             <div className="grid grid-cols-1 gap-4">
               {tickets.map((ticket) => (

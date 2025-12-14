@@ -21,6 +21,7 @@ import { Label } from '../ui/label';
 import { trpc } from '../../lib/trpc';
 import { toast } from 'sonner';
 import { Badge } from '../ui/badge';
+import { ButtonSpinner } from '../ui/loading-spinner';
 
 interface CreateProjectModalProps {
   open: boolean;
@@ -354,7 +355,14 @@ const CreateProjectModal = ({ open, onOpenChange }: CreateProjectModalProps) => 
               className="bg-blue-600 hover:bg-blue-700 text-white"
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Project'}
+              {createMutation.isPending ? (
+                <>
+                  <ButtonSpinner className="mr-2" />
+                  Creating...
+                </>
+              ) : (
+                'Create Project'
+              )}
             </Button>
           </div>
         </form>

@@ -11,6 +11,8 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import { ConversationListSkeleton, MessageThreadSkeleton } from '../components/ui/skeletons';
+import { ButtonSpinner } from '../components/ui/loading-spinner';
 
 const MessagesPage = () => {
   const [messageContent, setMessageContent] = useState('');
@@ -89,10 +91,8 @@ const MessagesPage = () => {
 
             <ScrollArea className="flex-1">
               {isLoading ? (
-                <div className="p-4 space-y-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Skeleton key={i} className="h-20" />
-                  ))}
+                <div className="p-4">
+                  <ConversationListSkeleton />
                 </div>
               ) : messages && messages.length > 0 ? (
                 <div className="p-4 space-y-2">
@@ -236,8 +236,17 @@ const MessagesPage = () => {
                         className="w-full bg-blue-600 hover:bg-blue-700"
                         disabled={sendMessageMutation.isPending}
                       >
-                        <Send className="h-4 w-4 mr-2" />
-                        {sendMessageMutation.isPending ? 'Sending...' : 'Send Message'}
+                        {sendMessageMutation.isPending ? (
+                          <>
+                            <ButtonSpinner className="mr-2" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Send Message
+                          </>
+                        )}
                       </Button>
                     </form>
                   </CardContent>

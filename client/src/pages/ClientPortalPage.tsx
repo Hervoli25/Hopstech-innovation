@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import DashboardOverview from '../components/dashboard/DashboardOverview';
+import { FullScreenLoader } from '../components/ui/loading-spinner';
 
 const ClientPortalPage = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
@@ -107,13 +108,7 @@ const ClientPortalPage = () => {
 
   // Loading state
   if (authLoading) {
-    return (
-      <PageLayout>
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
-          <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
-        </div>
-      </PageLayout>
-    );
+    return <FullScreenLoader message="Loading HOPSTECH Portal..." />;
   }
 
   // Authenticated - Show Dashboard

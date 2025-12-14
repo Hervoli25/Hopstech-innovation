@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useRoute, Link } from 'wouter';
-import { ArrowLeft, Calendar, DollarSign, Clock, CheckCircle2, Circle, FileText, Activity } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, Clock, CheckCircle2, Circle, FileText, Activity, List, BarChart3, Zap } from 'lucide-react';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -9,10 +10,14 @@ import { Skeleton } from '../components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { trpc } from '../lib/trpc';
 import { cn } from '../lib/utils';
+import ProjectTimeline from '../components/project/ProjectTimeline';
+import ProjectInsights from '../components/project/ProjectInsights';
+import { ProjectDetailSkeleton } from '../components/ui/skeletons';
 
 const ClientProjectDetailPage = () => {
   const [, params] = useRoute('/client-portal/projects/:id');
   const projectId = params?.id ? parseInt(params.id) : null;
+  const [milestoneView, setMilestoneView] = useState<'list' | 'timeline'>('timeline');
 
   const { data: project, isLoading } = trpc.clientPortal.getProject.useQuery(
     { projectId: projectId! },
@@ -23,6 +28,13 @@ const ClientProjectDetailPage = () => {
     { limit: 20, offset: 0 },
     { enabled: !!projectId }
   );
+
+  const utils = trpc.useUtils();
+  const toggleMilestoneMutation = trpc.clientPortal.toggleMilestoneCompletion.useMutation({
+    onSuccess: () => {
+      utils.clientPortal.getProject.invalidate({ id: projectId! });
+    },
+  });
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -35,19 +47,80 @@ const ClientProjectDetailPage = () => {
     return colors[status as keyof typeof colors] || colors.planning;
   };
 
+  const handleMilestoneComplete = (milestoneId: string) => {
+    if (!projectId) return;
+    toggleMilestoneMutation.mutate({
+      projectId,
+      milestoneId,
+    });
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
         <main className="flex-1 overflow-y-auto p-6">
-          <Skeleton className="h-12 w-64 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <Skeleton className="h-64" />
-              <Skeleton className="h-96" />
+          {/* Header Skeleton */}
+          <div className="flex items-center gap-4 mb-6">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <Skeleton className="h-8 w-64" />
+                <Skeleton className="h-6 w-24 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-96" />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Content Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              <ProjectDetailSkeleton />
+
+              {/* Tabs Skeleton */}
+              <Card className="bg-slate-900 border-slate-800">
+                <CardHeader>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-10 w-32" />
+                    ))}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-24 w-full" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar Skeleton */}
             <div className="space-y-6">
-              <Skeleton className="h-48" />
-              <Skeleton className="h-64" />
+              <Card className="bg-slate-900 border-slate-800">
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i}>
+                      <Skeleton className="h-4 w-24 mb-2" />
+                      <Skeleton className="h-6 w-32" />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-900 border-slate-800">
+                <CardHeader>
+                  <Skeleton className="h-6 w-32" />
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-16 w-full" />
+                  ))}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>
@@ -132,8 +205,12 @@ const ClientProjectDetailPage = () => {
               </Card>
 
               {/* Tabs */}
-              <Tabs defaultValue="milestones" className="w-full">
+              <Tabs defaultValue="insights" className="w-full">
                 <TabsList className="bg-slate-900 border border-slate-800">
+                  <TabsTrigger value="insights" className="data-[state=active]:bg-blue-600">
+                    <Zap className="h-4 w-4 mr-2" />
+                    AI Insights
+                  </TabsTrigger>
                   <TabsTrigger value="milestones" className="data-[state=active]:bg-blue-600">
                     Milestones
                   </TabsTrigger>
@@ -145,15 +222,61 @@ const ClientProjectDetailPage = () => {
                   </TabsTrigger>
                 </TabsList>
 
+                <TabsContent value="insights" className="mt-6">
+                  <ProjectInsights project={project} />
+                </TabsContent>
+
                 <TabsContent value="milestones" className="mt-6">
-                  <Card className="bg-slate-900 border-slate-800">
-                    <CardHeader>
-                      <CardTitle className="text-white">Milestones</CardTitle>
-                      <CardDescription className="text-gray-400">
-                        Track project milestones and deadlines
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                  {/* View Toggle */}
+                  <div className="flex items-center justify-end gap-2 mb-4">
+                    <Button
+                      variant={milestoneView === 'timeline' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setMilestoneView('timeline')}
+                      className={cn(
+                        milestoneView === 'timeline'
+                          ? 'bg-blue-600 hover:bg-blue-700'
+                          : 'border-slate-700 text-gray-400 hover:bg-slate-800'
+                      )}
+                    >
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Timeline View
+                    </Button>
+                    <Button
+                      variant={milestoneView === 'list' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setMilestoneView('list')}
+                      className={cn(
+                        milestoneView === 'list'
+                          ? 'bg-blue-600 hover:bg-blue-700'
+                          : 'border-slate-700 text-gray-400 hover:bg-slate-800'
+                      )}
+                    >
+                      <List className="h-4 w-4 mr-2" />
+                      List View
+                    </Button>
+                  </div>
+
+                  {/* Timeline View */}
+                  {milestoneView === 'timeline' && (
+                    <ProjectTimeline
+                      milestones={project.milestones || []}
+                      projectStartDate={project.startDate}
+                      projectEndDate={project.endDate}
+                      onMilestoneComplete={handleMilestoneComplete}
+                    />
+                  )}
+
+                  {/* List View */}
+                  {milestoneView === 'list' && (
+                    <Card className="bg-slate-900 border-slate-800">
+                      <CardHeader>
+                        <CardTitle className="text-white">Milestones</CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Track project milestones and deadlines
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
                       {project.milestones && project.milestones.length > 0 ? (
                         <div className="space-y-4">
                           {project.milestones.map((milestone) => (
@@ -199,6 +322,7 @@ const ClientProjectDetailPage = () => {
                       )}
                     </CardContent>
                   </Card>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="deliverables" className="mt-6">

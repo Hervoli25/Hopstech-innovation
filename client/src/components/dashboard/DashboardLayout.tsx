@@ -19,6 +19,9 @@ import { trpc } from '../../lib/trpc';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import NotificationCenter from './NotificationCenter';
+import PWAInstallPrompt from '../pwa/PWAInstallPrompt';
+import PWAUpdatePrompt from '../pwa/PWAUpdatePrompt';
+import OfflineIndicator from '../pwa/OfflineIndicator';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -190,6 +193,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </a>
             </Link>
             <div className="flex items-center gap-2">
+              <OfflineIndicator />
               <NotificationCenter />
               <Button
                 variant="ghost"
@@ -205,6 +209,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
         {children}
       </div>
+
+      {/* PWA Components */}
+      <PWAInstallPrompt />
+      <PWAUpdatePrompt />
     </div>
   );
 };

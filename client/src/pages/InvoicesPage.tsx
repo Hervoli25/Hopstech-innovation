@@ -23,6 +23,7 @@ import {
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import { InvoiceListSkeleton, StatsCardSkeleton } from '../components/ui/skeletons';
 
 type InvoiceStatus = 'pending' | 'paid' | 'overdue' | 'cancelled';
 
@@ -86,20 +87,27 @@ const InvoicesPage = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-slate-900 border-slate-800">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-400 mb-1">Total</p>
-                    <p className="text-2xl font-bold text-white">
-                      ${(totalStats.total / 100).toLocaleString()}
-                    </p>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <StatsCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="bg-slate-900 border-slate-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Total</p>
+                      <p className="text-2xl font-bold text-white">
+                        ${(totalStats.total / 100).toLocaleString()}
+                      </p>
+                    </div>
+                    <DollarSign className="h-8 w-8 text-blue-400" />
                   </div>
-                  <DollarSign className="h-8 w-8 text-blue-400" />
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
             <Card className="bg-slate-900 border-slate-800">
               <CardContent className="p-4">
@@ -142,7 +150,8 @@ const InvoicesPage = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
+            </div>
+          )}
 
           {/* Filters */}
           <div className="flex gap-2 overflow-x-auto pb-2">
@@ -174,11 +183,7 @@ const InvoicesPage = () => {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Skeleton key={i} className="h-16" />
-                  ))}
-                </div>
+                <InvoiceListSkeleton />
               ) : invoices && invoices.length > 0 ? (
                 <div className="overflow-x-auto">
                   <Table>

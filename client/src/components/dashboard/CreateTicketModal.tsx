@@ -20,6 +20,7 @@ import {
 } from '../ui/select';
 import { trpc } from '../../lib/trpc';
 import { toast } from 'sonner';
+import { ButtonSpinner } from '../ui/loading-spinner';
 
 interface CreateTicketModalProps {
   open: boolean;
@@ -153,7 +154,14 @@ const CreateTicketModal = ({ open, onOpenChange }: CreateTicketModalProps) => {
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Ticket'}
+              {createMutation.isPending ? (
+                <>
+                  <ButtonSpinner className="mr-2" />
+                  Creating...
+                </>
+              ) : (
+                'Create Ticket'
+              )}
             </Button>
           </div>
         </form>

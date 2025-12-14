@@ -382,6 +382,126 @@ export const clientPortalRouter = router({
       return project;
     }),
 
+  // Update project milestones
+  updateProjectMilestones: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        milestones: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            description: z.string(),
+            dueDate: z.string(),
+            completed: z.boolean(),
+            completedAt: z.string().optional(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      // Verify project ownership
+      const [project] = await db
+        .select()
+        .from(clientProjectsExtended)
+        .where(
+          and(
+            eq(clientProjectsExtended.id, input.projectId),
+            eq(clientProjectsExtended.userId, ctx.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!project) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+      }
+
+      // Update milestones
+      const [updatedProject] = await db
+        .update(clientProjectsExtended)
+        .set({ milestones: input.milestones })
+        .where(eq(clientProjectsExtended.id, input.projectId))
+        .returning();
+
+      // Log activity
+      await db.insert(activityLog).values({
+        userId: ctx.user.id,
+        action: "project_updated",
+        entity: "project",
+        entityId: input.projectId,
+        description: `${ctx.user.name} updated project milestones`,
+        metadata: { projectId: input.projectId, milestonesCount: input.milestones.length },
+      });
+
+      return updatedProject;
+    }),
+
+  // Toggle milestone completion
+  toggleMilestoneCompletion: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.number(),
+        milestoneId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      // Get project
+      const [project] = await db
+        .select()
+        .from(clientProjectsExtended)
+        .where(
+          and(
+            eq(clientProjectsExtended.id, input.projectId),
+            eq(clientProjectsExtended.userId, ctx.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!project) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Project not found" });
+      }
+
+      // Update milestone completion status
+      const milestones = (project.milestones || []) as any[];
+      const updatedMilestones = milestones.map((m: any) => {
+        if (m.id === input.milestoneId) {
+          const isCompleted = !m.completed;
+          return {
+            ...m,
+            completed: isCompleted,
+            completedAt: isCompleted ? new Date().toISOString() : undefined,
+          };
+        }
+        return m;
+      });
+
+      // Update project
+      const [updatedProject] = await db
+        .update(clientProjectsExtended)
+        .set({ milestones: updatedMilestones })
+        .where(eq(clientProjectsExtended.id, input.projectId))
+        .returning();
+
+      // Log activity
+      const milestone = updatedMilestones.find((m: any) => m.id === input.milestoneId);
+      await db.insert(activityLog).values({
+        userId: ctx.user.id,
+        action: milestone?.completed ? "milestone_completed" : "milestone_reopened",
+        entity: "milestone",
+        entityId: input.projectId,
+        description: `${ctx.user.name} ${milestone?.completed ? 'completed' : 'reopened'} milestone: ${milestone?.title}`,
+        metadata: { projectId: input.projectId, milestoneId: input.milestoneId },
+      });
+
+      return updatedProject;
+    }),
+
   /**
    * ========================================
    * INVOICES & BILLING
