@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { Code2, Search } from 'lucide-react';
+import { Code2, Search, ArrowRight, Cog, Cloud, Star } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { trpc } from '../lib/trpc';
+import SkillsSection from '../components/SkillsSection';
 
 const PortfolioPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +17,8 @@ const PortfolioPage = () => {
     search: searchQuery || undefined,
     category: selectedCategory,
   });
+  const { data: services, isLoading: servicesLoading } = trpc.services.getAll.useQuery();
+  const { data: testimonials, isLoading: testimonialsLoading } = trpc.testimonials.getFeatured.useQuery();
 
   const categories = ['All', 'DevOps', 'Full-Stack Development', 'Cloud Architecture'];
 
@@ -141,6 +144,123 @@ const PortfolioPage = () => {
               <p className="text-gray-500">Try adjusting your search or filters</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <SkillsSection />
+
+      {/* Services Section */}
+      <section className="py-20 bg-slate-900/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">What I Do</h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Specialized services to help your business thrive in the digital age
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {servicesLoading ? (
+              <div className="col-span-3 text-center text-gray-400">Loading services...</div>
+            ) : services && services.length > 0 ? (
+              services.slice(0, 3).map((service) => (
+                <Card key={service.id} className="bg-slate-800/50 border-slate-700 hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20">
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4">
+                      {service.icon === 'DevOps' && <Cog className="h-6 w-6 text-blue-400" />}
+                      {service.icon === 'Code' && <Code2 className="h-6 w-6 text-blue-400" />}
+                      {service.icon === 'Cloud' && <Cloud className="h-6 w-6 text-blue-400" />}
+                    </div>
+                    <CardTitle className="text-white">{service.title}</CardTitle>
+                    <CardDescription className="text-gray-400">
+                      {service.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {service.features && service.features.slice(0, 4).map((feature, idx) => (
+                        <li key={idx} className="text-sm text-gray-400 flex items-start">
+                          <span className="text-blue-400 mr-2">•</span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-gray-400">No services available</div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Client Testimonials</h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              What people say about working with me
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonialsLoading ? (
+              <div className="col-span-3 text-center text-gray-400">Loading testimonials...</div>
+            ) : testimonials && testimonials.length > 0 ? (
+              testimonials.slice(0, 3).map((testimonial) => (
+                <Card key={testimonial.id} className="bg-slate-800/50 border-slate-700">
+                  <CardHeader>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-blue-400 font-semibold">
+                          {testimonial.name.charAt(0)}
+                        </span>
+                      </div>
+                      <div>
+                        <CardTitle className="text-white text-lg">{testimonial.name}</CardTitle>
+                        <CardDescription className="text-gray-400 text-sm">
+                          {testimonial.role} at {testimonial.company}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <div className="flex mt-2">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 text-sm italic">"{testimonial.content}"</p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-3 text-center text-gray-400">No testimonials available</div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-slate-900/50">
+        <div className="container mx-auto px-4">
+          <Card className="bg-gradient-to-r from-blue-600 to-purple-600 border-0">
+            <CardContent className="p-12 text-center">
+              <h2 className="text-4xl font-bold mb-4 text-white">Ready to Start Your Project?</h2>
+              <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+                Let's discuss how I can help bring your ideas to life with cutting-edge technology and DevOps best practices.
+              </p>
+              <Link href="/contact">
+                <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
+                  Get in Touch
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </PageLayout>
