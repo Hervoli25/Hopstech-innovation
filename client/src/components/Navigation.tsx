@@ -34,20 +34,18 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/">
-            <a className="flex items-center space-x-3 text-white hover:opacity-90 transition-all group">
-              <div className="relative">
-                <img
-                  src="/logo.png"
-                  alt="HOPSTECH INNOVATION Logo"
-                  className="h-12 w-12 rounded-full ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/30 group-hover:ring-blue-400 group-hover:shadow-blue-400/40 transition-all duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/20 to-purple-500/20 group-hover:from-blue-400/30 group-hover:to-purple-500/30 transition-all duration-300"></div>
-              </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
-                HOPSTECH INNOVATION
-              </span>
-            </a>
+          <Link href="/" className="flex items-center space-x-3 text-white hover:opacity-90 transition-all group">
+            <div className="relative">
+              <img
+                src="/logo.png"
+                alt="HOPSTECH INNOVATION Logo"
+                className="h-12 w-12 rounded-full ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/30 group-hover:ring-blue-400 group-hover:shadow-blue-400/40 transition-all duration-300 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/20 to-purple-500/20 group-hover:from-blue-400/30 group-hover:to-purple-500/30 transition-all duration-300"></div>
+            </div>
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
+              HOPSTECH INNOVATION
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
