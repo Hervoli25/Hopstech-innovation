@@ -14,6 +14,10 @@ build/
 .env.test.local
 .env.production.local
 
+# Deployment documentation with sensitive info
+VERCEL_DEPLOYMENT.md
+MIGRATION_SUMMARY.md
+
 # IDE and editor files
 .vscode/
 .idea/

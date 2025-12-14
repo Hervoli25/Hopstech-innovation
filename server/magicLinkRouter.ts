@@ -3,6 +3,9 @@ import { publicProcedure, router } from "./_core/trpc";
 import { getDb, createMagicLink, getMagicLinkByToken, markMagicLinkAsUsed, getUserByEmail, upsertUser } from "./db";
 import { nanoid } from "nanoid";
 import { sendMagicLinkEmail } from "./emailService";
+import { sdk } from "./_core/sdk";
+import { COOKIE_NAME } from "@shared/const";
+import { getSessionCookieOptions } from "./_core/cookies";
 
 const MAGIC_LINK_EXPIRY_MINUTES = 15;
 
@@ -75,7 +78,7 @@ export const magicLinkRouter = router({
         token: z.string().min(1, "Token is required"),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { token } = input;
 
       // Get magic link from database
@@ -126,6 +129,14 @@ export const magicLinkRouter = router({
         throw new Error("Failed to create or retrieve user");
       }
 
+      // Create session token and set cookie
+      const sessionToken = await sdk.createSessionToken(user.openId, {
+        name: user.name || user.email || '',
+      });
+
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
+
       return {
         success: true,
         user: {
@@ -135,6 +146,37 @@ export const magicLinkRouter = router({
           role: user.role,
         },
         message: "Successfully authenticated!",
+      };
+    }),
+
+  // Get current session
+  getCurrentSession: publicProcedure
+    .query(async ({ ctx }) => {
+      // Check if session exists
+      if (!ctx.user) {
+        return { authenticated: false, user: null };
+      }
+
+      return {
+        authenticated: true,
+        user: {
+          id: ctx.user.id,
+          email: ctx.user.email,
+          name: ctx.user.name,
+          role: ctx.user.role,
+        },
+      };
+    }),
+
+  // Logout
+  logout: publicProcedure
+    .mutation(async ({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+
+      return {
+        success: true,
+        message: 'Logged out successfully',
       };
     }),
 });
