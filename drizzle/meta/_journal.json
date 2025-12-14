@@ -29,6 +29,13 @@
       "when": 1765705639429,
       "tag": "0003_fast_expediter",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1765712427017,
+      "tag": "0004_useful_boomer",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,7 @@
-import { 
-  FolderKanban, 
-  MessageSquare, 
-  FileText, 
+import {
+  FolderKanban,
+  MessageSquare,
+  FileText,
   CheckCircle2,
   Clock,
   TrendingUp,
@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import { trpc } from '../../lib/trpc';
 import { Link } from 'wouter';
 import { Skeleton } from '../ui/skeleton';
+import NotificationPermissionPrompt from './NotificationPermissionPrompt';
 
 const DashboardOverview = () => {
   const { data: stats, isLoading: statsLoading } = trpc.clientPortal.getDashboardStats.useQuery();
@@ -92,6 +93,9 @@ const DashboardOverview = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Notification Permission Prompt */}
+      <NotificationPermissionPrompt />
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat) => {

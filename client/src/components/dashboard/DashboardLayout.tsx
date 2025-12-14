@@ -1,12 +1,12 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  MessageSquare, 
-  FileText, 
-  User, 
-  Bell, 
+import {
+  LayoutDashboard,
+  FolderKanban,
+  MessageSquare,
+  FileText,
+  User,
+  Bell,
   LogOut,
   Menu,
   X,
@@ -18,6 +18,7 @@ import { Badge } from '../ui/badge';
 import { trpc } from '../../lib/trpc';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
+import NotificationCenter from './NotificationCenter';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -159,6 +160,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Top Bar - Desktop */}
+        <header className="hidden lg:flex bg-slate-900 border-b border-slate-800 px-6 py-4 items-center justify-between">
+          <div>
+            <h1 className="text-white font-semibold text-lg">
+              {location === '/client-portal' && 'Dashboard'}
+              {location.startsWith('/client-portal/projects') && 'Projects'}
+              {location.startsWith('/client-portal/messages') && 'Messages'}
+              {location.startsWith('/client-portal/invoices') && 'Invoices'}
+              {location.startsWith('/client-portal/support') && 'Support'}
+              {location.startsWith('/client-portal/analytics') && 'Analytics'}
+              {location.startsWith('/client-portal/profile') && 'Profile'}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
+          </div>
+        </header>
+
         {/* Top Bar - Mobile */}
         <header className="lg:hidden bg-slate-900 border-b border-slate-800 p-4">
           <div className="flex items-center justify-between">
@@ -170,14 +189,17 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <span className="text-white font-bold">HOPSTECH</span>
               </a>
             </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-white"
-            >
-              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              <NotificationCenter />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="text-white"
+              >
+                {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </header>
 

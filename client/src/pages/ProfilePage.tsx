@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Phone, Building, MapPin, Save, Bell } from 'lucide-react';
+import { User, Mail, Phone, Building, MapPin, Save, Bell, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -8,12 +8,16 @@ import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Switch } from '../components/ui/switch';
 import { Skeleton } from '../components/ui/skeleton';
+import { Badge } from '../components/ui/badge';
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
+import NotificationPermissionPrompt from '../components/dashboard/NotificationPermissionPrompt';
+import { useNotifications } from '../hooks/useNotifications';
 
 const ProfilePage = () => {
   const { data: profile, isLoading } = trpc.clientPortal.getProfile.useQuery();
   const utils = trpc.useUtils();
+  const { permission, isSupported, requestPermission } = useNotifications();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -24,11 +28,13 @@ const ProfilePage = () => {
     bio: '',
   });
 
-  const [notifications, setNotifications] = useState({
-    emailNotifications: true,
+  const [notificationSettings, setNotificationSettings] = useState({
+    email: true,
+    push: true,
     projectUpdates: true,
-    invoiceReminders: true,
-    supportReplies: true,
+    messages: true,
+    invoices: true,
+    tickets: true,
   });
 
   useEffect(() => {
@@ -38,14 +44,19 @@ const ProfilePage = () => {
         email: profile.email || '',
         phone: profile.phone || '',
         company: profile.company || '',
-        address: profile.address || '',
+        address: profile.location || '',
         bio: profile.bio || '',
       });
-      setNotifications({
-        emailNotifications: profile.emailNotifications ?? true,
-        projectUpdates: profile.projectUpdates ?? true,
-        invoiceReminders: profile.invoiceReminders ?? true,
-        supportReplies: profile.supportReplies ?? true,
+
+      // Load notification settings from profile
+      const settings = profile.notificationSettings || {};
+      setNotificationSettings({
+        email: settings.email ?? true,
+        push: settings.push ?? true,
+        projectUpdates: settings.projectUpdates ?? true,
+        messages: settings.messages ?? true,
+        invoices: settings.invoices ?? true,
+        tickets: settings.tickets ?? true,
       });
     }
   }, [profile]);
@@ -60,13 +71,29 @@ const ProfilePage = () => {
     },
   });
 
+  const updateNotificationsMutation = trpc.clientPortal.updateNotificationSettings.useMutation({
+    onSuccess: () => {
+      toast.success('Notification preferences updated!');
+      utils.clientPortal.getProfile.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to update notification settings');
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Update profile
     updateProfileMutation.mutate({
-      ...formData,
-      ...notifications,
+      bio: formData.bio,
+      phone: formData.phone,
+      company: formData.company,
+      location: formData.address,
     });
+
+    // Update notification settings
+    updateNotificationsMutation.mutate(notificationSettings);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -74,7 +101,7 @@ const ProfilePage = () => {
   };
 
   const handleNotificationChange = (field: string, value: boolean) => {
-    setNotifications((prev) => ({ ...prev, [field]: value }));
+    setNotificationSettings((prev) => ({ ...prev, [field]: value }));
   };
 
   if (isLoading) {
@@ -215,54 +242,125 @@ const ProfilePage = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    {/* Browser Notification Permission Status */}
+                    {isSupported && (
+                      <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Bell className="h-4 w-4 text-gray-400" />
+                            <span className="text-white font-medium">Browser Notifications</span>
+                          </div>
+                          {permission === 'granted' && (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Enabled
+                            </Badge>
+                          )}
+                          {permission === 'denied' && (
+                            <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
+                              <XCircle className="h-3 w-3 mr-1" />
+                              Blocked
+                            </Badge>
+                          )}
+                          {permission === 'default' && (
+                            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              Not Set
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-400 mb-3">
+                          {permission === 'granted' && 'You will receive desktop notifications for important updates.'}
+                          {permission === 'denied' && 'Browser notifications are blocked. Enable them in your browser settings.'}
+                          {permission === 'default' && 'Enable browser notifications to receive real-time updates.'}
+                        </p>
+                        {permission === 'default' && (
+                          <Button
+                            onClick={requestPermission}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            Enable Browser Notifications
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Notification Type Preferences */}
+                    <div className="flex items-center justify-between py-3 border-b border-slate-800">
                       <div>
                         <p className="text-white font-medium">Email Notifications</p>
-                        <p className="text-sm text-gray-400">Receive email updates</p>
+                        <p className="text-sm text-gray-400">Receive notifications via email</p>
                       </div>
                       <Switch
-                        checked={notifications.emailNotifications}
+                        checked={notificationSettings.email}
                         onCheckedChange={(checked) =>
-                          handleNotificationChange('emailNotifications', checked)
+                          handleNotificationChange('email', checked)
                         }
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between py-3 border-b border-slate-800">
                       <div>
-                        <p className="text-white font-medium">Project Updates</p>
-                        <p className="text-sm text-gray-400">Get notified about project changes</p>
+                        <p className="text-white font-medium">Push Notifications</p>
+                        <p className="text-sm text-gray-400">Receive browser push notifications</p>
                       </div>
                       <Switch
-                        checked={notifications.projectUpdates}
+                        checked={notificationSettings.push}
+                        onCheckedChange={(checked) =>
+                          handleNotificationChange('push', checked)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-3 border-b border-slate-800">
+                      <div>
+                        <p className="text-white font-medium">Project Updates</p>
+                        <p className="text-sm text-gray-400">Milestones, progress, and deliverables</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.projectUpdates}
                         onCheckedChange={(checked) =>
                           handleNotificationChange('projectUpdates', checked)
                         }
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between py-3 border-b border-slate-800">
                       <div>
-                        <p className="text-white font-medium">Invoice Reminders</p>
-                        <p className="text-sm text-gray-400">Receive payment reminders</p>
+                        <p className="text-white font-medium">Messages</p>
+                        <p className="text-sm text-gray-400">New messages and conversations</p>
                       </div>
                       <Switch
-                        checked={notifications.invoiceReminders}
+                        checked={notificationSettings.messages}
                         onCheckedChange={(checked) =>
-                          handleNotificationChange('invoiceReminders', checked)
+                          handleNotificationChange('messages', checked)
                         }
                       />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between py-3 border-b border-slate-800">
                       <div>
-                        <p className="text-white font-medium">Support Replies</p>
-                        <p className="text-sm text-gray-400">Get notified of support responses</p>
+                        <p className="text-white font-medium">Invoices</p>
+                        <p className="text-sm text-gray-400">New invoices and payment reminders</p>
                       </div>
                       <Switch
-                        checked={notifications.supportReplies}
+                        checked={notificationSettings.invoices}
                         onCheckedChange={(checked) =>
-                          handleNotificationChange('supportReplies', checked)
+                          handleNotificationChange('invoices', checked)
+                        }
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between py-3">
+                      <div>
+                        <p className="text-white font-medium">Support Tickets</p>
+                        <p className="text-sm text-gray-400">Ticket updates and responses</p>
+                      </div>
+                      <Switch
+                        checked={notificationSettings.tickets}
+                        onCheckedChange={(checked) =>
+                          handleNotificationChange('tickets', checked)
                         }
                       />
                     </div>

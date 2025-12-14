@@ -750,6 +750,14 @@ export const clientPortalRouter = router({
         conditions.push(eq(notifications.read, false));
       }
 
+      // Filter out snoozed notifications
+      conditions.push(
+        or(
+          sql`${notifications.snoozedUntil} IS NULL`,
+          sql`${notifications.snoozedUntil} <= NOW()`
+        )!
+      );
+
       const notificationList = await db
         .select()
         .from(notifications)
@@ -758,12 +766,30 @@ export const clientPortalRouter = router({
         .limit(input.limit)
         .offset(input.offset);
 
-      return notificationList;
+      // Get unread count
+      const unreadCountResult = await db
+        .select({ count: count() })
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.userId, ctx.user.id),
+            eq(notifications.read, false),
+            or(
+              sql`${notifications.snoozedUntil} IS NULL`,
+              sql`${notifications.snoozedUntil} <= NOW()`
+            )!
+          )
+        );
+
+      return {
+        notifications: notificationList,
+        unreadCount: Number(unreadCountResult[0]?.count || 0),
+      };
     }),
 
   // Mark notification as read
-  markNotificationRead: protectedProcedure
-    .input(z.object({ id: z.number() }))
+  markNotificationAsRead: protectedProcedure
+    .input(z.object({ notificationId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
@@ -773,7 +799,7 @@ export const clientPortalRouter = router({
         .set({ read: true, readAt: new Date() })
         .where(
           and(
-            eq(notifications.id, input.id),
+            eq(notifications.id, input.notificationId),
             eq(notifications.userId, ctx.user.id)
           )
         );
@@ -782,7 +808,7 @@ export const clientPortalRouter = router({
     }),
 
   // Mark all notifications as read
-  markAllNotificationsRead: protectedProcedure.mutation(async ({ ctx }) => {
+  markAllNotificationsAsRead: protectedProcedure.mutation(async ({ ctx }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
@@ -798,6 +824,50 @@ export const clientPortalRouter = router({
 
     return { success: true };
   }),
+
+  // Delete notification
+  deleteNotification: protectedProcedure
+    .input(z.object({ notificationId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      await db
+        .delete(notifications)
+        .where(
+          and(
+            eq(notifications.id, input.notificationId),
+            eq(notifications.userId, ctx.user.id)
+          )
+        );
+
+      return { success: true };
+    }),
+
+  // Snooze notification
+  snoozeNotification: protectedProcedure
+    .input(
+      z.object({
+        notificationId: z.number(),
+        snoozeUntil: z.date(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+      await db
+        .update(notifications)
+        .set({ snoozedUntil: input.snoozeUntil })
+        .where(
+          and(
+            eq(notifications.id, input.notificationId),
+            eq(notifications.userId, ctx.user.id)
+          )
+        );
+
+      return { success: true };
+    }),
 
   /**
    * ========================================

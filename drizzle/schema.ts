@@ -26,6 +26,8 @@ export const ticketPriorityEnum = pgEnum("ticket_priority", ["low", "medium", "h
 export const projectPriorityEnum = pgEnum("project_priority", ["low", "medium", "high", "urgent"]);
 export const messageTypeEnum = pgEnum("message_type", ["text", "file", "system"]);
 export const notificationTypeEnum = pgEnum("notification_type", ["project_update", "message", "invoice", "ticket", "system"]);
+export const notificationPriorityEnum = pgEnum("notification_priority", ["low", "medium", "high", "urgent"]);
+export const notificationActionTypeEnum = pgEnum("notification_action_type", ["none", "view", "approve", "respond", "download", "custom"]);
 
 /**
  * Core user table backing auth flow.
@@ -593,17 +595,25 @@ export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
   type: notificationTypeEnum("type").notNull(),
+  priority: notificationPriorityEnum("priority").default("medium").notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
   link: varchar("link", { length: 500 }),
+  actionType: notificationActionTypeEnum("actionType").default("none").notNull(),
+  actionUrl: varchar("actionUrl", { length: 500 }),
+  actionLabel: varchar("actionLabel", { length: 100 }),
+  groupKey: varchar("groupKey", { length: 255 }), // For grouping related notifications
   read: boolean("read").default(false).notNull(),
   readAt: timestamp("readAt", { mode: "date", withTimezone: true }),
+  snoozedUntil: timestamp("snoozedUntil", { mode: "date", withTimezone: true }),
   metadata: jsonb("metadata").$type<Record<string, any>>(),
   createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
 }, (table) => ({
   userIdIdx: index("notifications_user_id_idx").on(table.userId),
   typeIdx: index("notifications_type_idx").on(table.type),
+  priorityIdx: index("notifications_priority_idx").on(table.priority),
   readIdx: index("notifications_read_idx").on(table.read),
+  groupKeyIdx: index("notifications_group_key_idx").on(table.groupKey),
   createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
 }));
 
