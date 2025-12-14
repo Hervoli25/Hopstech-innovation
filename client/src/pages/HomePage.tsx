@@ -10,6 +10,9 @@ import { LiveTerminal } from '../components/LiveTerminal';
 import { BuildWithMe } from '../components/BuildWithMe';
 import { ProjectStory } from '../components/ProjectStory';
 import { TechConstellation } from '../components/TechConstellation';
+import { RealTimeTransparency } from '../components/RealTimeTransparency';
+import { ClientPortalPreview } from '../components/ClientPortalPreview';
+import { DeveloperEasterEgg } from '../components/DeveloperEasterEgg';
 
 const HomePage = () => {
 
@@ -86,6 +89,15 @@ const HomePage = () => {
 
       {/* Tech Constellation Section */}
       <TechConstellation />
+
+      {/* Real-Time Transparency Section */}
+      <RealTimeTransparency />
+
+      {/* Client Portal Preview Section */}
+      <ClientPortalPreview />
+
+      {/* Developer Easter Egg */}
+      <DeveloperEasterEgg />
     </PageLayout>
   );
 };
