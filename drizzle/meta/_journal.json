@@ -15,6 +15,13 @@
       "when": 1765624320035,
       "tag": "0001_mean_firebird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765697019487,
+      "tag": "0002_true_kat_farrell",
+      "breakpoints": true
     }
   ]
 }

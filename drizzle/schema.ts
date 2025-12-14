@@ -19,6 +19,12 @@ export const userRoleEnum = pgEnum("user_role", ["user", "admin", "client"]);
 export const contactStatusEnum = pgEnum("contact_status", ["new", "read", "replied", "archived"]);
 export const magicLinkStatusEnum = pgEnum("magic_link_status", ["pending", "used", "expired"]);
 export const projectInquiryStatusEnum = pgEnum("project_inquiry_status", ["new", "reviewing", "accepted", "rejected"]);
+export const projectStatusEnum = pgEnum("project_status", ["planning", "in_progress", "on_hold", "completed", "archived"]);
+export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "pending", "paid", "overdue", "cancelled"]);
+export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "waiting_response", "resolved", "closed"]);
+export const ticketPriorityEnum = pgEnum("ticket_priority", ["low", "medium", "high", "urgent"]);
+export const messageTypeEnum = pgEnum("message_type", ["text", "file", "system"]);
+export const notificationTypeEnum = pgEnum("notification_type", ["project_update", "message", "invoice", "ticket", "system"]);
 
 /**
  * Core user table backing auth flow.
@@ -325,3 +331,281 @@ export const projectUpdates = pgTable("projectUpdates", {
 
 export type ProjectUpdate = typeof projectUpdates.$inferSelect;
 export type InsertProjectUpdate = typeof projectUpdates.$inferInsert;
+
+/**
+ * User Profiles table - extended user information
+ */
+export const userProfiles = pgTable("userProfiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  avatar: varchar("avatar", { length: 500 }),
+  bio: text("bio"),
+  company: varchar("company", { length: 255 }),
+  position: varchar("position", { length: 255 }),
+  phone: varchar("phone", { length: 50 }),
+  website: varchar("website", { length: 500 }),
+  location: varchar("location", { length: 255 }),
+  timezone: varchar("timezone", { length: 100 }),
+  preferences: jsonb("preferences").$type<Record<string, any>>().default({}),
+  notificationSettings: jsonb("notificationSettings").$type<{
+    email: boolean;
+    push: boolean;
+    projectUpdates: boolean;
+    messages: boolean;
+    invoices: boolean;
+  }>().default({
+    email: true,
+    push: true,
+    projectUpdates: true,
+    messages: true,
+    invoices: true,
+  }),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: uniqueIndex("user_profiles_user_id_idx").on(table.userId),
+}));
+
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
+/**
+ * Client Projects Extended - enhanced project management
+ */
+export const clientProjectsExtended = pgTable("clientProjectsExtended", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  status: projectStatusEnum("status").default("planning").notNull(),
+  progress: integer("progress").default(0).notNull(), // 0-100
+  budget: integer("budget"), // in cents
+  startDate: timestamp("startDate", { mode: "date", withTimezone: true }),
+  endDate: timestamp("endDate", { mode: "date", withTimezone: true }),
+  estimatedHours: integer("estimatedHours"),
+  actualHours: integer("actualHours").default(0),
+  technologies: jsonb("technologies").$type<string[]>().default([]),
+  milestones: jsonb("milestones").$type<Array<{
+    id: string;
+    title: string;
+    description: string;
+    dueDate: string;
+    completed: boolean;
+    completedAt?: string;
+  }>>().default([]),
+  deliverables: jsonb("deliverables").$type<Array<{
+    id: string;
+    title: string;
+    description: string;
+    url?: string;
+    completed: boolean;
+  }>>().default([]),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completedAt", { mode: "date", withTimezone: true }),
+}, (table) => ({
+  userIdIdx: index("client_projects_ext_user_id_idx").on(table.userId),
+  statusIdx: index("client_projects_ext_status_idx").on(table.status),
+  createdAtIdx: index("client_projects_ext_created_at_idx").on(table.createdAt),
+}));
+
+export type ClientProjectExtended = typeof clientProjectsExtended.$inferSelect;
+export type InsertClientProjectExtended = typeof clientProjectsExtended.$inferInsert;
+
+/**
+ * Project Files table - file uploads for projects
+ */
+export const projectFiles = pgTable("projectFiles", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  uploadedBy: integer("uploadedBy").notNull().references(() => users.id),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileUrl: varchar("fileUrl", { length: 1000 }).notNull(),
+  fileSize: integer("fileSize").notNull(), // in bytes
+  fileType: varchar("fileType", { length: 100 }).notNull(),
+  category: varchar("category", { length: 100 }).default("general"), // general, design, document, code, etc.
+  description: text("description"),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  projectIdIdx: index("project_files_project_id_idx").on(table.projectId),
+  uploadedByIdx: index("project_files_uploaded_by_idx").on(table.uploadedBy),
+  categoryIdx: index("project_files_category_idx").on(table.category),
+}));
+
+export type ProjectFile = typeof projectFiles.$inferSelect;
+export type InsertProjectFile = typeof projectFiles.$inferInsert;
+
+/**
+ * Invoices table - billing and payment management
+ */
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: integer("projectId").references(() => clientProjectsExtended.id),
+  invoiceNumber: varchar("invoiceNumber", { length: 100 }).notNull().unique(),
+  status: invoiceStatusEnum("status").default("draft").notNull(),
+  amount: integer("amount").notNull(), // in cents
+  currency: varchar("currency", { length: 10 }).default("USD").notNull(),
+  tax: integer("tax").default(0), // in cents
+  discount: integer("discount").default(0), // in cents
+  total: integer("total").notNull(), // in cents
+  items: jsonb("items").$type<Array<{
+    id: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }>>().notNull(),
+  notes: text("notes"),
+  dueDate: timestamp("dueDate", { mode: "date", withTimezone: true }),
+  paidAt: timestamp("paidAt", { mode: "date", withTimezone: true }),
+  paymentMethod: varchar("paymentMethod", { length: 100 }),
+  paymentReference: varchar("paymentReference", { length: 255 }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("invoices_user_id_idx").on(table.userId),
+  projectIdIdx: index("invoices_project_id_idx").on(table.projectId),
+  statusIdx: index("invoices_status_idx").on(table.status),
+  invoiceNumberIdx: uniqueIndex("invoices_invoice_number_idx").on(table.invoiceNumber),
+  dueDateIdx: index("invoices_due_date_idx").on(table.dueDate),
+}));
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = typeof invoices.$inferInsert;
+
+/**
+ * Support Tickets table
+ */
+export const supportTickets = pgTable("supportTickets", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: integer("projectId").references(() => clientProjectsExtended.id),
+  ticketNumber: varchar("ticketNumber", { length: 100 }).notNull().unique(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  status: ticketStatusEnum("status").default("open").notNull(),
+  priority: ticketPriorityEnum("priority").default("medium").notNull(),
+  category: varchar("category", { length: 100 }).default("general"), // general, technical, billing, feature_request
+  assignedTo: integer("assignedTo").references(() => users.id),
+  attachments: jsonb("attachments").$type<string[]>().default([]),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  resolvedAt: timestamp("resolvedAt", { mode: "date", withTimezone: true }),
+  closedAt: timestamp("closedAt", { mode: "date", withTimezone: true }),
+}, (table) => ({
+  userIdIdx: index("support_tickets_user_id_idx").on(table.userId),
+  projectIdIdx: index("support_tickets_project_id_idx").on(table.projectId),
+  statusIdx: index("support_tickets_status_idx").on(table.status),
+  priorityIdx: index("support_tickets_priority_idx").on(table.priority),
+  ticketNumberIdx: uniqueIndex("support_tickets_ticket_number_idx").on(table.ticketNumber),
+}));
+
+export type SupportTicket = typeof supportTickets.$inferSelect;
+export type InsertSupportTicket = typeof supportTickets.$inferInsert;
+
+/**
+ * Ticket Messages table - messages within support tickets
+ */
+export const ticketMessages = pgTable("ticketMessages", {
+  id: serial("id").primaryKey(),
+  ticketId: integer("ticketId").notNull().references(() => supportTickets.id, { onDelete: "cascade" }),
+  authorId: integer("authorId").notNull().references(() => users.id),
+  content: text("content").notNull(),
+  attachments: jsonb("attachments").$type<string[]>().default([]),
+  isInternal: boolean("isInternal").default(false), // internal notes not visible to client
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  ticketIdIdx: index("ticket_messages_ticket_id_idx").on(table.ticketId),
+  authorIdIdx: index("ticket_messages_author_id_idx").on(table.authorId),
+  createdAtIdx: index("ticket_messages_created_at_idx").on(table.createdAt),
+}));
+
+export type TicketMessage = typeof ticketMessages.$inferSelect;
+export type InsertTicketMessage = typeof ticketMessages.$inferInsert;
+
+/**
+ * Messages table - direct messaging between users
+ */
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  senderId: integer("senderId").notNull().references(() => users.id),
+  recipientId: integer("recipientId").notNull().references(() => users.id),
+  projectId: integer("projectId").references(() => clientProjectsExtended.id),
+  content: text("content").notNull(),
+  type: messageTypeEnum("type").default("text").notNull(),
+  attachments: jsonb("attachments").$type<Array<{
+    fileName: string;
+    fileUrl: string;
+    fileSize: number;
+    fileType: string;
+  }>>().default([]),
+  read: boolean("read").default(false).notNull(),
+  readAt: timestamp("readAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  senderIdIdx: index("messages_sender_id_idx").on(table.senderId),
+  recipientIdIdx: index("messages_recipient_id_idx").on(table.recipientId),
+  projectIdIdx: index("messages_project_id_idx").on(table.projectId),
+  readIdx: index("messages_read_idx").on(table.read),
+  createdAtIdx: index("messages_created_at_idx").on(table.createdAt),
+}));
+
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+
+/**
+ * Notifications table
+ */
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: notificationTypeEnum("type").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  link: varchar("link", { length: 500 }),
+  read: boolean("read").default(false).notNull(),
+  readAt: timestamp("readAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("notifications_user_id_idx").on(table.userId),
+  typeIdx: index("notifications_type_idx").on(table.type),
+  readIdx: index("notifications_read_idx").on(table.read),
+  createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
+}));
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * Activity Log table - tracks all user and system activities
+ */
+export const activityLog = pgTable("activityLog", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").references(() => users.id),
+  action: varchar("action", { length: 255 }).notNull(),
+  entity: varchar("entity", { length: 100 }).notNull(), // project, invoice, ticket, message, etc.
+  entityId: integer("entityId"),
+  description: text("description").notNull(),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  ip: varchar("ip", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("activity_log_user_id_idx").on(table.userId),
+  entityIdx: index("activity_log_entity_idx").on(table.entity),
+  entityIdIdx: index("activity_log_entity_id_idx").on(table.entityId),
+  createdAtIdx: index("activity_log_created_at_idx").on(table.createdAt),
+}));
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = typeof activityLog.$inferInsert;
