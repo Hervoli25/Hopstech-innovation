@@ -10,6 +10,13 @@ import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ContactPage from "./pages/ContactPage";
 import ClientPortalPage from "./pages/ClientPortalPage";
 import AuthVerifyPage from "./pages/AuthVerifyPage";
+import ProjectsPage from "./pages/ProjectsPage";
+import ClientProjectDetailPage from "./pages/ClientProjectDetailPage";
+import MessagesPage from "./pages/MessagesPage";
+import InvoicesPage from "./pages/InvoicesPage";
+import SupportPage from "./pages/SupportPage";
+import ProfilePage from "./pages/ProfilePage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import { ScrollProgress } from "./components/animations/ScrollProgress";
 
 function Router() {
@@ -19,6 +26,13 @@ function Router() {
       <Route path={"/portfolio"} component={PortfolioPage} />
       <Route path={"/portfolio/:slug"} component={ProjectDetailPage} />
       <Route path={"/contact"} component={ContactPage} />
+      <Route path={"/client-portal/projects/:id"} component={ClientProjectDetailPage} />
+      <Route path={"/client-portal/projects"} component={ProjectsPage} />
+      <Route path={"/client-portal/messages"} component={MessagesPage} />
+      <Route path={"/client-portal/invoices"} component={InvoicesPage} />
+      <Route path={"/client-portal/support"} component={SupportPage} />
+      <Route path={"/client-portal/profile"} component={ProfilePage} />
+      <Route path={"/client-portal/analytics"} component={AnalyticsPage} />
       <Route path={"/client-portal"} component={ClientPortalPage} />
       <Route path={"/auth/verify"} component={AuthVerifyPage} />
       <Route path={"/404"} component={NotFound} />

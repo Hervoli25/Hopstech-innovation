@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Rocket, CheckCircle2, Clock, TrendingUp, Mail, Building2, Phone, FileText, LogIn, LogOut, User, Briefcase, Loader2, MessageSquare, BarChart3 } from 'lucide-react';
+import { Rocket, CheckCircle2, Clock, TrendingUp, Mail, Building2, Phone, FileText, LogIn, Loader2 } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -10,6 +10,8 @@ import { Badge } from '../components/ui/badge';
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
+import DashboardLayout from '../components/dashboard/DashboardLayout';
+import DashboardOverview from '../components/dashboard/DashboardOverview';
 
 const ClientPortalPage = () => {
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
@@ -54,16 +56,6 @@ const ClientPortalPage = () => {
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to send magic link. Please try again.');
-    },
-  });
-
-  const logoutMutation = trpc.magicLink.logout.useMutation({
-    onSuccess: () => {
-      toast.success('Logged out successfully');
-      window.location.reload();
-    },
-    onError: () => {
-      toast.error('Failed to logout');
     },
   });
 
@@ -127,126 +119,21 @@ const ClientPortalPage = () => {
   // Authenticated - Show Dashboard
   if (isAuthenticated && user) {
     return (
-      <PageLayout>
-        <section className="py-20 bg-slate-950 min-h-screen">
-          <div className="container mx-auto px-4">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                  Welcome back, {user.name}!
-                </h1>
-                <p className="text-gray-400">
-                  Manage your projects and track progress
-                </p>
-              </div>
-              <Button
-                onClick={() => logoutMutation.mutate()}
-                variant="outline"
-                className="border-slate-700 text-gray-300 hover:bg-slate-800 w-full md:w-auto"
-                disabled={logoutMutation.isPending}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+      <DashboardLayout>
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Welcome back, {user.name}!
+              </h1>
+              <p className="text-gray-400">
+                Here's what's happening with your projects today
+              </p>
             </div>
-
-            {/* User Info Card */}
-            <Card className="bg-slate-900 border-slate-800 mb-8">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <User className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold text-lg">{user.name}</h3>
-                    <p className="text-gray-400 text-sm">{user.email}</p>
-                  </div>
-                  <Badge className="bg-green-500/10 text-green-400 border-green-500/30">
-                    {user.role}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Dashboard Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <Card className="bg-slate-900 border-slate-800">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-500/20 rounded-lg">
-                      <Briefcase className="h-6 w-6 text-blue-400" />
-                    </div>
-                    <CardTitle className="text-white">Active Projects</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-white mb-2">0</p>
-                  <p className="text-sm text-gray-400">No active projects yet</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900 border-slate-800">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <CheckCircle2 className="h-6 w-6 text-green-400" />
-                    </div>
-                    <CardTitle className="text-white">Completed</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-white mb-2">0</p>
-                  <p className="text-sm text-gray-400">Projects completed</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-900 border-slate-800">
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                      <MessageSquare className="h-6 w-6 text-purple-400" />
-                    </div>
-                    <CardTitle className="text-white">Messages</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-white mb-2">0</p>
-                  <p className="text-sm text-gray-400">Unread messages</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Coming Soon Section */}
-            <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30">
-              <CardHeader>
-                <CardTitle className="text-white">Dashboard Features Coming Soon</CardTitle>
-                <CardDescription className="text-gray-300">
-                  We're building amazing features for you
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <BarChart3 className="h-5 w-5 text-blue-400 mt-1" />
-                    <div>
-                      <h4 className="text-white font-medium">Project Analytics</h4>
-                      <p className="text-sm text-gray-400">Track progress and milestones</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <FileText className="h-5 w-5 text-green-400 mt-1" />
-                    <div>
-                      <h4 className="text-white font-medium">Document Sharing</h4>
-                      <p className="text-sm text-gray-400">Access proposals and reports</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <DashboardOverview />
           </div>
-        </section>
-      </PageLayout>
+        </main>
+      </DashboardLayout>
     );
   }
 

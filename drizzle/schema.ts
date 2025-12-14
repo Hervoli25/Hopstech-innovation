@@ -23,6 +23,7 @@ export const projectStatusEnum = pgEnum("project_status", ["planning", "in_progr
 export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "pending", "paid", "overdue", "cancelled"]);
 export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "waiting_response", "resolved", "closed"]);
 export const ticketPriorityEnum = pgEnum("ticket_priority", ["low", "medium", "high", "urgent"]);
+export const projectPriorityEnum = pgEnum("project_priority", ["low", "medium", "high", "urgent"]);
 export const messageTypeEnum = pgEnum("message_type", ["text", "file", "system"]);
 export const notificationTypeEnum = pgEnum("notification_type", ["project_update", "message", "invoice", "ticket", "system"]);
 
@@ -377,6 +378,8 @@ export const clientProjectsExtended = pgTable("clientProjectsExtended", {
   userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description").notNull(),
+  projectType: varchar("projectType", { length: 255 }), // e.g., "Web Application", "Mobile App", "Custom Project"
+  priority: projectPriorityEnum("priority").default("medium").notNull(),
   status: projectStatusEnum("status").default("planning").notNull(),
   progress: integer("progress").default(0).notNull(), // 0-100
   budget: integer("budget"), // in cents
@@ -412,6 +415,27 @@ export const clientProjectsExtended = pgTable("clientProjectsExtended", {
 
 export type ClientProjectExtended = typeof clientProjectsExtended.$inferSelect;
 export type InsertClientProjectExtended = typeof clientProjectsExtended.$inferInsert;
+
+/**
+ * Project Types table - predefined project types for selection
+ */
+export const projectTypes = pgTable("projectTypes", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 100 }),
+  active: boolean("active").default(true).notNull(),
+  order: integer("order").default(0).notNull(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  nameIdx: uniqueIndex("project_types_name_idx").on(table.name),
+  activeIdx: index("project_types_active_idx").on(table.active),
+  orderIdx: index("project_types_order_idx").on(table.order),
+}));
+
+export type ProjectType = typeof projectTypes.$inferSelect;
+export type InsertProjectType = typeof projectTypes.$inferInsert;
 
 /**
  * Project Files table - file uploads for projects

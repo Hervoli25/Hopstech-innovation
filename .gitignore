@@ -17,6 +17,10 @@ build/
 # Deployment documentation with sensitive info
 VERCEL_DEPLOYMENT.md
 MIGRATION_SUMMARY.md
+DEPLOYMENT.md
+
+# Seed scripts that might contain sensitive data
+server/seedProjectTypes.ts
 
 # IDE and editor files
 .vscode/

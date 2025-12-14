@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import { projects, services, blogPosts, testimonials } from "../drizzle/schema";
+import { projects, services, blogPosts, testimonials, projectTypes } from "../drizzle/schema";
 
 async function seed() {
   console.log("🌱 Seeding database...");
@@ -291,6 +291,67 @@ Continuous Integration and Continuous Deployment (CI/CD) are fundamental to mode
         rating: 5,
         featured: true,
         approved: true
+      }
+    ]);
+
+    // Seed Project Types
+    console.log("🏷️  Seeding project types...");
+    await db.insert(projectTypes).values([
+      {
+        name: "Web Application",
+        description: "Full-stack web applications with modern frameworks",
+        icon: "Globe",
+        active: true,
+        order: 1
+      },
+      {
+        name: "Mobile Application",
+        description: "Native or cross-platform mobile apps",
+        icon: "Smartphone",
+        active: true,
+        order: 2
+      },
+      {
+        name: "DevOps & Infrastructure",
+        description: "CI/CD pipelines, cloud infrastructure, and automation",
+        icon: "Server",
+        active: true,
+        order: 3
+      },
+      {
+        name: "E-commerce Platform",
+        description: "Online stores and marketplace solutions",
+        icon: "ShoppingCart",
+        active: true,
+        order: 4
+      },
+      {
+        name: "API Development",
+        description: "RESTful or GraphQL API services",
+        icon: "Code",
+        active: true,
+        order: 5
+      },
+      {
+        name: "Cloud Migration",
+        description: "Migrate existing systems to cloud platforms",
+        icon: "Cloud",
+        active: true,
+        order: 6
+      },
+      {
+        name: "Consulting & Strategy",
+        description: "Technical consulting and architecture planning",
+        icon: "Lightbulb",
+        active: true,
+        order: 7
+      },
+      {
+        name: "Maintenance & Support",
+        description: "Ongoing maintenance and technical support",
+        icon: "Wrench",
+        active: true,
+        order: 8
       }
     ]);
 

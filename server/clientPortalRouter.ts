@@ -11,7 +11,8 @@ import {
   ticketMessages,
   messages,
   notifications,
-  activityLog
+  activityLog,
+  projectTypes
 } from "../drizzle/schema";
 import { eq, and, desc, asc, sql, or, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -317,12 +318,28 @@ export const clientPortalRouter = router({
       };
     }),
 
+  // Get project types
+  getProjectTypes: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+    const types = await db
+      .select()
+      .from(projectTypes)
+      .where(eq(projectTypes.active, true))
+      .orderBy(asc(projectTypes.order), asc(projectTypes.name));
+
+    return types;
+  }),
+
   // Create new project request
   createProject: protectedProcedure
     .input(
       z.object({
         title: z.string().min(3, "Title must be at least 3 characters"),
         description: z.string().min(10, "Description must be at least 10 characters"),
+        projectType: z.string().optional(),
+        priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
         budget: z.number().optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
@@ -339,6 +356,8 @@ export const clientPortalRouter = router({
           userId: ctx.user.id,
           title: input.title,
           description: input.description,
+          projectType: input.projectType || null,
+          priority: input.priority,
           status: "planning",
           progress: 0,
           budget: input.budget,
