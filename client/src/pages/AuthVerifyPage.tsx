@@ -14,9 +14,9 @@ const AuthVerifyPage = () => {
   const verifyMutation = trpc.magicLink.verifyMagicLink.useMutation({
     onSuccess: (data) => {
       setStatus('success');
-      // Redirect to client dashboard after 2 seconds
+      // Redirect to client portal after 2 seconds
       setTimeout(() => {
-        setLocation('/client-dashboard');
+        setLocation('/client-portal');
       }, 2000);
     },
     onError: (error) => {
