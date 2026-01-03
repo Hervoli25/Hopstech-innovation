@@ -13,14 +13,17 @@ const createTransporter = () => {
   const emailPass = process.env.EMAIL_PASS;
   const emailHost = process.env.EMAIL_HOST || 'smtppro.zoho.eu';
   const emailPort = parseInt(process.env.EMAIL_PORT || '587');
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
-  console.log('[Email] Configuration check:', {
-    emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : 'NOT SET',
-    emailPass: emailPass ? '***SET***' : 'NOT SET',
-    emailHost,
-    emailPort,
-    nodeEnv: process.env.NODE_ENV,
-  });
+  if (isDevelopment) {
+    console.log('[Email] Configuration check:', {
+      emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : 'NOT SET',
+      emailPass: emailPass ? '***SET***' : 'NOT SET',
+      emailHost,
+      emailPort,
+      nodeEnv: process.env.NODE_ENV,
+    });
+  }
 
   if (!emailUser || !emailPass) {
     console.warn('[Email] Email credentials not configured. Emails will not be sent.');
@@ -36,11 +39,13 @@ const createTransporter = () => {
         user: emailUser,
         pass: emailPass,
       },
-      logger: true, // Enable logging
-      debug: true, // Enable debug output
+      logger: isDevelopment, // Enable logging only in development
+      debug: isDevelopment, // Enable debug output only in development
     });
 
-    console.log('[Email] Transporter created successfully');
+    if (isDevelopment) {
+      console.log('[Email] Transporter created successfully');
+    }
     return transporter;
   } catch (error) {
     console.error('[Email] Failed to create transporter:', error);
@@ -50,17 +55,20 @@ const createTransporter = () => {
 
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
   const transporter = createTransporter();
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   if (!transporter) {
     // In development, just log the magic link
-    console.log('\n==============================================');
-    console.log('🔐 MAGIC LINK (Development Mode)');
-    console.log('==============================================');
-    console.log(`To: ${data.to}`);
-    console.log(`Name: ${data.name}`);
-    console.log(`Link: ${data.magicLink}`);
-    console.log(`Expires in: ${data.expiresInMinutes} minutes`);
-    console.log('==============================================\n');
+    if (isDevelopment) {
+      console.log('\n==============================================');
+      console.log('🔐 MAGIC LINK (Development Mode)');
+      console.log('==============================================');
+      console.log(`To: ${data.to}`);
+      console.log(`Name: ${data.name}`);
+      console.log(`Link: ${data.magicLink}`);
+      console.log(`Expires in: ${data.expiresInMinutes} minutes`);
+      console.log('==============================================\n');
+    }
     return;
   }
 
@@ -160,7 +168,9 @@ If you didn't request this email, you can safely ignore it.
   `.trim();
 
   try {
-    console.log(`[Email] Attempting to send magic link to ${data.to}`);
+    if (isDevelopment) {
+      console.log(`[Email] Attempting to send magic link to ${data.to}`);
+    }
 
     const info = await transporter.sendMail({
       from: `"HOPSTECH INNOVATION" <${process.env.EMAIL_USER}>`,
@@ -170,15 +180,21 @@ If you didn't request this email, you can safely ignore it.
       html: htmlContent,
     });
 
-    console.log(`[Email] Magic link sent successfully to ${data.to}`, {
-      messageId: info.messageId,
-      response: info.response,
-    });
+    if (isDevelopment) {
+      console.log(`[Email] Magic link sent successfully to ${data.to}`, {
+        messageId: info.messageId,
+        response: info.response,
+      });
+    } else {
+      console.log('[Email] Magic link sent successfully', {
+        messageId: info.messageId,
+      });
+    }
   } catch (error) {
+    // Log error without exposing recipient email address
     console.error('[Email] Failed to send magic link:', {
       error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      to: data.to,
+      stack: isDevelopment && error instanceof Error ? error.stack : undefined,
     });
 
     // Throw a more descriptive error
