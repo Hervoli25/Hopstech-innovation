@@ -11,23 +11,41 @@ interface MagicLinkEmailData {
 const createTransporter = () => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
-  const emailHost = process.env.EMAIL_HOST || 'smtp.zoho.eu';
+  const emailHost = process.env.EMAIL_HOST || 'smtppro.zoho.eu';
   const emailPort = parseInt(process.env.EMAIL_PORT || '587');
+
+  console.log('[Email] Configuration check:', {
+    emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : 'NOT SET',
+    emailPass: emailPass ? '***SET***' : 'NOT SET',
+    emailHost,
+    emailPort,
+    nodeEnv: process.env.NODE_ENV,
+  });
 
   if (!emailUser || !emailPass) {
     console.warn('[Email] Email credentials not configured. Emails will not be sent.');
     return null;
   }
 
-  return nodemailer.createTransport({
-    host: emailHost,
-    port: emailPort,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: emailUser,
-      pass: emailPass,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      host: emailHost,
+      port: emailPort,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: emailUser,
+        pass: emailPass,
+      },
+      logger: true, // Enable logging
+      debug: true, // Enable debug output
+    });
+
+    console.log('[Email] Transporter created successfully');
+    return transporter;
+  } catch (error) {
+    console.error('[Email] Failed to create transporter:', error);
+    throw error;
+  }
 };
 
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
@@ -142,7 +160,9 @@ If you didn't request this email, you can safely ignore it.
   `.trim();
 
   try {
-    await transporter.sendMail({
+    console.log(`[Email] Attempting to send magic link to ${data.to}`);
+
+    const info = await transporter.sendMail({
       from: `"HOPSTECH INNOVATION" <${process.env.EMAIL_USER}>`,
       to: data.to,
       subject: '🔐 Sign in to HOPSTECH INNOVATION Client Portal',
@@ -150,10 +170,20 @@ If you didn't request this email, you can safely ignore it.
       html: htmlContent,
     });
 
-    console.log(`[Email] Magic link sent to ${data.to}`);
+    console.log(`[Email] Magic link sent successfully to ${data.to}`, {
+      messageId: info.messageId,
+      response: info.response,
+    });
   } catch (error) {
-    console.error('[Email] Failed to send magic link:', error);
-    throw error;
+    console.error('[Email] Failed to send magic link:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      to: data.to,
+    });
+
+    // Throw a more descriptive error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw new Error(`Email sending failed: ${errorMessage}`);
   }
 }
 
