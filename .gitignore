@@ -32,6 +32,7 @@ server/seedProjectTypes.ts
 
 # One-time migration and utility scripts
 server/update-prestige-project.ts
+server/add-gamehub-project.ts
 verify-images.ts
 
 # IDE and editor files

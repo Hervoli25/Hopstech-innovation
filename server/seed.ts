@@ -157,6 +157,72 @@ The platform successfully transformed the car wash business operations, resultin
           "User Satisfaction": "4.9/5"
         } as any,
         publishedAt: new Date("2024-11-15")
+      },
+      {
+        title: "Game Hub Platform",
+        slug: "game-hub-platform",
+        description: "Modern Game Discovery Platform with Advanced Filtering",
+        longDescription: `Game Hub is a modern, responsive game discovery platform built with React and TypeScript that allows users to browse, search, and filter thousands of games using the RAWG Video Games Database API.
+
+**Overview**
+
+Game Hub provides an intuitive interface for gamers to discover new games based on their preferences. The platform features advanced filtering capabilities, multiple sorting options, and a beautiful responsive design that works seamlessly across all devices.
+
+**Key Features**
+
+- **Comprehensive Game Database**: Access to thousands of games from the RAWG API
+- **Advanced Search**: Find games quickly by name with real-time search
+- **Genre Filtering**: Browse games by genre (Action, RPG, Strategy, Sports, etc.)
+- **Platform Filtering**: Filter by gaming platform (PC, PlayStation, Xbox, Nintendo, etc.)
+- **Smart Sorting**: Sort by relevance, date added, name, release date, popularity, or rating
+- **Theme Toggle**: Switch between dark and light modes for comfortable viewing
+- **Responsive Design**: Optimized experience on desktop, tablet, and mobile devices
+- **Fast Performance**: Built with Vite for lightning-fast load times
+
+**Technical Implementation**
+
+The platform leverages modern web technologies to deliver a smooth, performant user experience. React 18 provides the foundation for the UI, while TypeScript ensures type safety throughout the codebase. Chakra UI components offer a consistent, accessible design system, and Axios handles efficient API communication with the RAWG database.
+
+**User Experience**
+
+Game Hub prioritizes user experience with intuitive navigation, smooth animations, and instant feedback. The filtering system allows users to combine multiple criteria to find exactly what they're looking for, while the responsive grid layout adapts beautifully to any screen size.
+
+**Impact**
+
+- Provides instant access to comprehensive game information
+- Helps users discover new games based on their preferences
+- Offers a modern, polished alternative to traditional game databases
+- Demonstrates best practices in React development and API integration`,
+        thumbnail: "/showcase/gamehub1.png",
+        images: [
+          "/showcase/gamehub1.png",
+          "/showcase/gamehub2.png",
+          "/showcase/gamehub3.png"
+        ] as any,
+        technologies: [
+          "React 18",
+          "TypeScript",
+          "Vite",
+          "Chakra UI",
+          "Axios",
+          "RAWG API",
+          "React Query",
+          "Zustand",
+          "Vercel"
+        ] as any,
+        category: "Full-Stack Development",
+        client: "Personal Project",
+        url: "https://game-hub-hervoli25.vercel.app/",
+        githubUrl: "https://github.com/hervoli25/game-hub",
+        featured: true,
+        order: 2,
+        metrics: {
+          "API Integration": "RAWG Database",
+          "Games Available": "500,000+",
+          "Load Time": "<1s",
+          "User Rating": "4.7/5"
+        } as any,
+        publishedAt: new Date("2024-02-10")
       }
     ]);
 
