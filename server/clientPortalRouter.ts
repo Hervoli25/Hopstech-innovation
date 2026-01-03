@@ -16,6 +16,7 @@ import {
 } from "../drizzle/schema";
 import { eq, and, desc, asc, sql, or, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { sendProjectInquiryEmail } from "./emailService";
 
 export const clientPortalRouter = router({
   /**
@@ -62,6 +63,23 @@ export const clientPortalRouter = router({
         ip,
         userAgent,
       });
+
+      // Send email notification to admin
+      try {
+        await sendProjectInquiryEmail({
+          name: input.name,
+          email: input.email,
+          company: input.company,
+          phone: input.phone,
+          projectType: input.projectType,
+          budget: input.budget,
+          timeline: input.timeline,
+          description: input.description,
+        });
+      } catch (error) {
+        console.error('[ProjectInquiry] Failed to send email notification:', error);
+        // Don't fail the request if email fails, inquiry is already saved in DB
+      }
 
       return {
         success: true,

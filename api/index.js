@@ -1143,6 +1143,338 @@ var testimonialRouter = router({
 
 // server/contactRouter.ts
 import { z as z5 } from "zod";
+
+// server/emailService.ts
+import { Resend } from "resend";
+import nodemailer from "nodemailer";
+var getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
+  const isDevelopment = process.env.NODE_ENV === "development";
+  if (isDevelopment) {
+    console.log("[Email] Configuration check:", {
+      resendApiKey: apiKey ? "***SET***" : "NOT SET",
+      nodeEnv: process.env.NODE_ENV
+    });
+  }
+  if (!apiKey) {
+    console.warn("[Email] Resend API key not configured. Emails will not be sent.");
+    return null;
+  }
+  try {
+    const resend = new Resend(apiKey);
+    if (isDevelopment) {
+      console.log("[Email] Resend client initialized successfully");
+    }
+    return resend;
+  } catch (error) {
+    console.error("[Email] Failed to initialize Resend client:", error);
+    throw error;
+  }
+};
+async function sendMagicLinkEmail(data) {
+  const resend = getResendClient();
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const fromEmail = process.env.EMAIL_FROM_NOREPLY || "noreply@hopstecinnovation.com";
+  if (!resend) {
+    if (isDevelopment) {
+      console.log("\n==============================================");
+      console.log("\u{1F510} MAGIC LINK (Development Mode)");
+      console.log("==============================================");
+      console.log(`To: ${data.to}`);
+      console.log(`Name: ${data.name}`);
+      console.log(`Link: ${data.magicLink}`);
+      console.log(`Expires in: ${data.expiresInMinutes} minutes`);
+      console.log("==============================================\n");
+    }
+    return;
+  }
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Sign in to HOPSTECH INNOVATION</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0f172a;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0f172a; padding: 40px 20px;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+              <!-- Header -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
+                    HOPSTECH INNOVATION
+                  </h1>
+                  <p style="margin: 10px 0 0 0; color: #e0e7ff; font-size: 14px;">
+                    Client Portal Access
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px 30px;">
+                  <h2 style="margin: 0 0 20px 0; color: #f1f5f9; font-size: 24px; font-weight: 600;">
+                    Hi ${data.name}! \u{1F44B}
+                  </h2>
+                  
+                  <p style="margin: 0 0 20px 0; color: #cbd5e1; font-size: 16px; line-height: 1.6;">
+                    Click the button below to securely sign in to your HOPSTECH INNOVATION client portal. This link will expire in <strong style="color: #f1f5f9;">${data.expiresInMinutes} minutes</strong>.
+                  </p>
+                  
+                  <!-- CTA Button -->
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                    <tr>
+                      <td align="center">
+                        <a href="${data.magicLink}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);">
+                          Sign In to Client Portal
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  
+                  <p style="margin: 30px 0 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
+                    If the button doesn't work, copy and paste this link into your browser:
+                  </p>
+                  <p style="margin: 10px 0 0 0; padding: 12px; background-color: #0f172a; border-radius: 6px; word-break: break-all;">
+                    <a href="${data.magicLink}" style="color: #60a5fa; text-decoration: none; font-size: 13px;">
+                      ${data.magicLink}
+                    </a>
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 30px; background-color: #0f172a; border-top: 1px solid #334155;">
+                  <p style="margin: 0 0 10px 0; color: #64748b; font-size: 13px; text-align: center;">
+                    This email was sent to <strong style="color: #94a3b8;">${data.to}</strong>
+                  </p>
+                  <p style="margin: 0; color: #64748b; font-size: 13px; text-align: center;">
+                    If you didn't request this email, you can safely ignore it.
+                  </p>
+                  <p style="margin: 20px 0 0 0; color: #475569; font-size: 12px; text-align: center;">
+                    \xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} HOPSTECH INNOVATION. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+  const textContent = `
+Hi ${data.name}!
+
+Click the link below to sign in to your HOPSTECH INNOVATION client portal:
+
+${data.magicLink}
+
+This link will expire in ${data.expiresInMinutes} minutes.
+
+If you didn't request this email, you can safely ignore it.
+
+---
+\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} HOPSTECH INNOVATION
+  `.trim();
+  try {
+    if (isDevelopment) {
+      console.log(`[Email] Attempting to send magic link via Resend to ${data.to}`);
+    }
+    const { data: emailData, error } = await resend.emails.send({
+      from: `HOPSTECH INNOVATION <${fromEmail}>`,
+      to: [data.to],
+      subject: "\u{1F510} Sign in to HOPSTECH INNOVATION Client Portal",
+      text: textContent,
+      html: htmlContent
+    });
+    if (error) {
+      throw new Error(error.message);
+    }
+    if (isDevelopment) {
+      console.log(`[Email] Magic link sent successfully to ${data.to}`, {
+        emailId: emailData?.id
+      });
+    } else {
+      console.log("[Email] Magic link sent successfully", {
+        emailId: emailData?.id
+      });
+    }
+  } catch (error) {
+    console.error("[Email] Failed to send magic link:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: isDevelopment && error instanceof Error ? error.stack : void 0
+    });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Email sending failed: ${errorMessage}`);
+  }
+}
+var createSMTPTransporter = () => {
+  const config = {
+    host: process.env.SMTP_HOST || "smtppro.zoho.eu",
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  };
+  return nodemailer.createTransport(config);
+};
+async function sendContactEmail(data) {
+  const transporter = createSMTPTransporter();
+  const adminEmail = process.env.EMAIL_ADMIN || "hk@hopstecinnovation.com";
+  const fromEmail = process.env.EMAIL_FROM_INFO || "info@hopstecinnovation.com";
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Contact Form Submission</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+        <div style="background-color: #fff; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #3b82f6; margin-top: 0;">New Contact Form Submission</h2>
+
+          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3b82f6;">
+            <p style="margin: 5px 0;"><strong>Name:</strong> ${data.name}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${data.email}</p>
+            ${data.company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${data.company}</p>` : ""}
+            ${data.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${data.phone}</p>` : ""}
+            <p style="margin: 5px 0;"><strong>Subject:</strong> ${data.subject}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Message:</h3>
+            <p style="white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 4px;">${data.message}</p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+
+          <p style="color: #666; font-size: 12px; margin: 0;">
+            This email was sent from the HOPSTECH INNOVATION contact form.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  const textContent = `
+New Contact Form Submission
+
+Name: ${data.name}
+Email: ${data.email}
+${data.company ? `Company: ${data.company}` : ""}
+${data.phone ? `Phone: ${data.phone}` : ""}
+Subject: ${data.subject}
+
+Message:
+${data.message}
+
+---
+This email was sent from the HOPSTECH INNOVATION contact form.
+  `.trim();
+  try {
+    await transporter.sendMail({
+      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+      to: adminEmail,
+      replyTo: data.email,
+      subject: `Contact Form: ${data.subject}`,
+      text: textContent,
+      html: htmlContent
+    });
+    console.log("[Email] Contact form email sent successfully");
+  } catch (error) {
+    console.error("[Email] Failed to send contact form email:", error);
+    throw new Error(`Failed to send contact form email: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+}
+async function sendProjectInquiryEmail(data) {
+  const transporter = createSMTPTransporter();
+  const adminEmail = process.env.EMAIL_ADMIN || "hk@hopstecinnovation.com";
+  const fromEmail = process.env.EMAIL_FROM_INFO || "info@hopstecinnovation.com";
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Project Inquiry</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+        <div style="background-color: #fff; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #8b5cf6; margin-top: 0;">\u{1F680} New Project Inquiry</h2>
+
+          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #8b5cf6;">
+            <p style="margin: 5px 0;"><strong>Name:</strong> ${data.name}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${data.email}</p>
+            ${data.company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${data.company}</p>` : ""}
+            ${data.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${data.phone}</p>` : ""}
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Project Details:</h3>
+            <p style="margin: 5px 0;"><strong>Type:</strong> ${data.projectType}</p>
+            ${data.budget ? `<p style="margin: 5px 0;"><strong>Budget:</strong> ${data.budget}</p>` : ""}
+            ${data.timeline ? `<p style="margin: 5px 0;"><strong>Timeline:</strong> ${data.timeline}</p>` : ""}
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Description:</h3>
+            <p style="white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 4px;">${data.description}</p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+
+          <p style="color: #666; font-size: 12px; margin: 0;">
+            This email was sent from the HOPSTECH INNOVATION client portal.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  const textContent = `
+New Project Inquiry
+
+Name: ${data.name}
+Email: ${data.email}
+${data.company ? `Company: ${data.company}` : ""}
+${data.phone ? `Phone: ${data.phone}` : ""}
+
+Project Details:
+Type: ${data.projectType}
+${data.budget ? `Budget: ${data.budget}` : ""}
+${data.timeline ? `Timeline: ${data.timeline}` : ""}
+
+Description:
+${data.description}
+
+---
+This email was sent from the HOPSTECH INNOVATION client portal.
+  `.trim();
+  try {
+    await transporter.sendMail({
+      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+      to: adminEmail,
+      replyTo: data.email,
+      subject: `Project Inquiry: ${data.projectType} - ${data.name}`,
+      text: textContent,
+      html: htmlContent
+    });
+    console.log("[Email] Project inquiry email sent successfully");
+  } catch (error) {
+    console.error("[Email] Failed to send project inquiry email:", error);
+    throw new Error(`Failed to send project inquiry email: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+}
+
+// server/contactRouter.ts
 var contactRouter = router({
   // Submit contact form
   submit: publicProcedure.input(
@@ -1173,6 +1505,18 @@ var contactRouter = router({
       ip,
       userAgent
     });
+    try {
+      await sendContactEmail({
+        name: input.name,
+        email: input.email,
+        company: input.company,
+        subject: input.subject,
+        message: input.message,
+        phone: input.phone
+      });
+    } catch (error) {
+      console.error("[Contact] Failed to send email notification:", error);
+    }
     return {
       success: true,
       message: "Thank you for your message! We'll get back to you soon."
@@ -1222,6 +1566,20 @@ var clientPortalRouter = router({
       ip,
       userAgent
     });
+    try {
+      await sendProjectInquiryEmail({
+        name: input.name,
+        email: input.email,
+        company: input.company,
+        phone: input.phone,
+        projectType: input.projectType,
+        budget: input.budget,
+        timeline: input.timeline,
+        description: input.description
+      });
+    } catch (error) {
+      console.error("[ProjectInquiry] Failed to send email notification:", error);
+    }
     return {
       success: true,
       message: "Thank you for your project inquiry! We'll review it and get back to you within 24 hours."
@@ -1850,177 +2208,6 @@ var clientPortalRouter = router({
 // server/magicLinkRouter.ts
 import { z as z7 } from "zod";
 import { nanoid } from "nanoid";
-
-// server/emailService.ts
-import { Resend } from "resend";
-var getResendClient = () => {
-  const apiKey = process.env.RESEND_API_KEY;
-  const isDevelopment = process.env.NODE_ENV === "development";
-  if (isDevelopment) {
-    console.log("[Email] Configuration check:", {
-      resendApiKey: apiKey ? "***SET***" : "NOT SET",
-      nodeEnv: process.env.NODE_ENV
-    });
-  }
-  if (!apiKey) {
-    console.warn("[Email] Resend API key not configured. Emails will not be sent.");
-    return null;
-  }
-  try {
-    const resend = new Resend(apiKey);
-    if (isDevelopment) {
-      console.log("[Email] Resend client initialized successfully");
-    }
-    return resend;
-  } catch (error) {
-    console.error("[Email] Failed to initialize Resend client:", error);
-    throw error;
-  }
-};
-async function sendMagicLinkEmail(data) {
-  const resend = getResendClient();
-  const isDevelopment = process.env.NODE_ENV === "development";
-  const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
-  if (!resend) {
-    if (isDevelopment) {
-      console.log("\n==============================================");
-      console.log("\u{1F510} MAGIC LINK (Development Mode)");
-      console.log("==============================================");
-      console.log(`To: ${data.to}`);
-      console.log(`Name: ${data.name}`);
-      console.log(`Link: ${data.magicLink}`);
-      console.log(`Expires in: ${data.expiresInMinutes} minutes`);
-      console.log("==============================================\n");
-    }
-    return;
-  }
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Sign in to HOPSTECH INNOVATION</title>
-    </head>
-    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0f172a;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0f172a; padding: 40px 20px;">
-        <tr>
-          <td align="center">
-            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-              <!-- Header -->
-              <tr>
-                <td style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
-                    HOPSTECH INNOVATION
-                  </h1>
-                  <p style="margin: 10px 0 0 0; color: #e0e7ff; font-size: 14px;">
-                    Client Portal Access
-                  </p>
-                </td>
-              </tr>
-              
-              <!-- Content -->
-              <tr>
-                <td style="padding: 40px 30px;">
-                  <h2 style="margin: 0 0 20px 0; color: #f1f5f9; font-size: 24px; font-weight: 600;">
-                    Hi ${data.name}! \u{1F44B}
-                  </h2>
-                  
-                  <p style="margin: 0 0 20px 0; color: #cbd5e1; font-size: 16px; line-height: 1.6;">
-                    Click the button below to securely sign in to your HOPSTECH INNOVATION client portal. This link will expire in <strong style="color: #f1f5f9;">${data.expiresInMinutes} minutes</strong>.
-                  </p>
-                  
-                  <!-- CTA Button -->
-                  <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
-                    <tr>
-                      <td align="center">
-                        <a href="${data.magicLink}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);">
-                          Sign In to Client Portal
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
-                  
-                  <p style="margin: 30px 0 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
-                    If the button doesn't work, copy and paste this link into your browser:
-                  </p>
-                  <p style="margin: 10px 0 0 0; padding: 12px; background-color: #0f172a; border-radius: 6px; word-break: break-all;">
-                    <a href="${data.magicLink}" style="color: #60a5fa; text-decoration: none; font-size: 13px;">
-                      ${data.magicLink}
-                    </a>
-                  </p>
-                </td>
-              </tr>
-              
-              <!-- Footer -->
-              <tr>
-                <td style="padding: 30px; background-color: #0f172a; border-top: 1px solid #334155;">
-                  <p style="margin: 0 0 10px 0; color: #64748b; font-size: 13px; text-align: center;">
-                    This email was sent to <strong style="color: #94a3b8;">${data.to}</strong>
-                  </p>
-                  <p style="margin: 0; color: #64748b; font-size: 13px; text-align: center;">
-                    If you didn't request this email, you can safely ignore it.
-                  </p>
-                  <p style="margin: 20px 0 0 0; color: #475569; font-size: 12px; text-align: center;">
-                    \xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} HOPSTECH INNOVATION. All rights reserved.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-  const textContent = `
-Hi ${data.name}!
-
-Click the link below to sign in to your HOPSTECH INNOVATION client portal:
-
-${data.magicLink}
-
-This link will expire in ${data.expiresInMinutes} minutes.
-
-If you didn't request this email, you can safely ignore it.
-
----
-\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} HOPSTECH INNOVATION
-  `.trim();
-  try {
-    if (isDevelopment) {
-      console.log(`[Email] Attempting to send magic link via Resend to ${data.to}`);
-    }
-    const { data: emailData, error } = await resend.emails.send({
-      from: `HOPSTECH INNOVATION <${fromEmail}>`,
-      to: [data.to],
-      subject: "\u{1F510} Sign in to HOPSTECH INNOVATION Client Portal",
-      text: textContent,
-      html: htmlContent
-    });
-    if (error) {
-      throw new Error(error.message);
-    }
-    if (isDevelopment) {
-      console.log(`[Email] Magic link sent successfully to ${data.to}`, {
-        emailId: emailData?.id
-      });
-    } else {
-      console.log("[Email] Magic link sent successfully", {
-        emailId: emailData?.id
-      });
-    }
-  } catch (error) {
-    console.error("[Email] Failed to send magic link:", {
-      error: error instanceof Error ? error.message : String(error),
-      stack: isDevelopment && error instanceof Error ? error.stack : void 0
-    });
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    throw new Error(`Email sending failed: ${errorMessage}`);
-  }
-}
-
-// server/magicLinkRouter.ts
 var MAGIC_LINK_EXPIRY_MINUTES = 15;
 var magicLinkRouter = router({
   // Request a magic link

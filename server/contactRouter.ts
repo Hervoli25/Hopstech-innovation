@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
 import { contacts } from "../drizzle/schema";
+import { sendContactEmail } from "./emailService";
 
 export const contactRouter = router({
   // Submit contact form
@@ -42,8 +43,20 @@ export const contactRouter = router({
         userAgent,
       });
 
-      // TODO: Send email via Zoho (will implement later)
-      // await sendContactEmail(input);
+      // Send email notification to admin
+      try {
+        await sendContactEmail({
+          name: input.name,
+          email: input.email,
+          company: input.company,
+          subject: input.subject,
+          message: input.message,
+          phone: input.phone,
+        });
+      } catch (error) {
+        console.error('[Contact] Failed to send email notification:', error);
+        // Don't fail the request if email fails, contact is already saved in DB
+      }
 
       return {
         success: true,

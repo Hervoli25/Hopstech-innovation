@@ -5,12 +5,33 @@
  */
 
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 export interface MagicLinkEmailData {
   to: string;
   name: string;
   magicLink: string;
   expiresInMinutes: number;
+}
+
+export interface ContactEmailData {
+  name: string;
+  email: string;
+  company?: string;
+  subject: string;
+  message: string;
+  phone?: string;
+}
+
+export interface ProjectInquiryEmailData {
+  name: string;
+  email: string;
+  company?: string;
+  phone?: string;
+  projectType: string;
+  budget?: string;
+  timeline?: string;
+  description: string;
 }
 
 // Initialize Resend client
@@ -47,7 +68,7 @@ const getResendClient = () => {
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
   const resend = getResendClient();
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  const fromEmail = process.env.EMAIL_FROM_NOREPLY || 'noreply@hopstecinnovation.com';
 
   if (!resend) {
     // In development, just log the magic link
@@ -195,6 +216,181 @@ If you didn't request this email, you can safely ignore it.
     // Throw a more descriptive error
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     throw new Error(`Email sending failed: ${errorMessage}`);
+  }
+}
+
+// Create SMTP transporter for contact forms
+const createSMTPTransporter = () => {
+  const config = {
+    host: process.env.SMTP_HOST || 'smtppro.zoho.eu',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  };
+
+  return nodemailer.createTransport(config);
+};
+
+// Send contact form email to admin
+export async function sendContactEmail(data: ContactEmailData): Promise<void> {
+  const transporter = createSMTPTransporter();
+  const adminEmail = process.env.EMAIL_ADMIN || 'hk@hopstecinnovation.com';
+  const fromEmail = process.env.EMAIL_FROM_INFO || 'info@hopstecinnovation.com';
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Contact Form Submission</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+        <div style="background-color: #fff; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #3b82f6; margin-top: 0;">New Contact Form Submission</h2>
+
+          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3b82f6;">
+            <p style="margin: 5px 0;"><strong>Name:</strong> ${data.name}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${data.email}</p>
+            ${data.company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${data.company}</p>` : ''}
+            ${data.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${data.phone}</p>` : ''}
+            <p style="margin: 5px 0;"><strong>Subject:</strong> ${data.subject}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Message:</h3>
+            <p style="white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 4px;">${data.message}</p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+
+          <p style="color: #666; font-size: 12px; margin: 0;">
+            This email was sent from the HOPSTECH INNOVATION contact form.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+New Contact Form Submission
+
+Name: ${data.name}
+Email: ${data.email}
+${data.company ? `Company: ${data.company}` : ''}
+${data.phone ? `Phone: ${data.phone}` : ''}
+Subject: ${data.subject}
+
+Message:
+${data.message}
+
+---
+This email was sent from the HOPSTECH INNOVATION contact form.
+  `.trim();
+
+  try {
+    await transporter.sendMail({
+      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+      to: adminEmail,
+      replyTo: data.email,
+      subject: `Contact Form: ${data.subject}`,
+      text: textContent,
+      html: htmlContent,
+    });
+
+    console.log('[Email] Contact form email sent successfully');
+  } catch (error) {
+    console.error('[Email] Failed to send contact form email:', error);
+    throw new Error(`Failed to send contact form email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Send project inquiry email to admin
+export async function sendProjectInquiryEmail(data: ProjectInquiryEmailData): Promise<void> {
+  const transporter = createSMTPTransporter();
+  const adminEmail = process.env.EMAIL_ADMIN || 'hk@hopstecinnovation.com';
+  const fromEmail = process.env.EMAIL_FROM_INFO || 'info@hopstecinnovation.com';
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>New Project Inquiry</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+        <div style="background-color: #fff; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #8b5cf6; margin-top: 0;">🚀 New Project Inquiry</h2>
+
+          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #8b5cf6;">
+            <p style="margin: 5px 0;"><strong>Name:</strong> ${data.name}</p>
+            <p style="margin: 5px 0;"><strong>Email:</strong> ${data.email}</p>
+            ${data.company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${data.company}</p>` : ''}
+            ${data.phone ? `<p style="margin: 5px 0;"><strong>Phone:</strong> ${data.phone}</p>` : ''}
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Project Details:</h3>
+            <p style="margin: 5px 0;"><strong>Type:</strong> ${data.projectType}</p>
+            ${data.budget ? `<p style="margin: 5px 0;"><strong>Budget:</strong> ${data.budget}</p>` : ''}
+            ${data.timeline ? `<p style="margin: 5px 0;"><strong>Timeline:</strong> ${data.timeline}</p>` : ''}
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3 style="color: #333; margin-bottom: 10px;">Description:</h3>
+            <p style="white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 4px;">${data.description}</p>
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
+
+          <p style="color: #666; font-size: 12px; margin: 0;">
+            This email was sent from the HOPSTECH INNOVATION client portal.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+New Project Inquiry
+
+Name: ${data.name}
+Email: ${data.email}
+${data.company ? `Company: ${data.company}` : ''}
+${data.phone ? `Phone: ${data.phone}` : ''}
+
+Project Details:
+Type: ${data.projectType}
+${data.budget ? `Budget: ${data.budget}` : ''}
+${data.timeline ? `Timeline: ${data.timeline}` : ''}
+
+Description:
+${data.description}
+
+---
+This email was sent from the HOPSTECH INNOVATION client portal.
+  `.trim();
+
+  try {
+    await transporter.sendMail({
+      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+      to: adminEmail,
+      replyTo: data.email,
+      subject: `Project Inquiry: ${data.projectType} - ${data.name}`,
+      text: textContent,
+      html: htmlContent,
+    });
+
+    console.log('[Email] Project inquiry email sent successfully');
+  } catch (error) {
+    console.error('[Email] Failed to send project inquiry email:', error);
+    throw new Error(`Failed to send project inquiry email: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
