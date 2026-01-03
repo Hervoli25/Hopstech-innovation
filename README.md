@@ -409,8 +409,8 @@ node scripts/generate-pwa-icons.js  # Generate PWA icons and favicons
 Edit `client/src/components/Footer.tsx`:
 
 ```typescript
-<a href="mailto:hk@hopstechinnovation.com">
-  hk@hopstechinnovation.com
+<a href="mailto:hk@hopstecinnovation.com">
+  hk@hopstecinnovation.com
 </a>
 <a href="tel:+33776026688">
   +33 7 76 02 66 88
@@ -648,11 +648,11 @@ HOPSTECH INNOVATION
 
 ### Contact Information
 
-- **Email**: [hk@hopstechinnovation.com](mailto:hk@hopstechinnovation.com)
+- **Email**: [hk@hopstecinnovation.com](mailto:hk@hopstecinnovation.com)
 - **Phone**: +33 7 76 02 66 88
 - **GitHub**: [github.com/hopstech](https://github.com/hopstech)
 - **LinkedIn**: [linkedin.com/in/herve-kajingu](https://linkedin.com/in/herve-kajingu)
-- **Website**: [hopstechinnovation.com](https://hopstechinnovation.com)
+- **Website**: [hopstecinnovation.com](https://hopstecinnovation.com)
 
 ### Business Inquiries
 
@@ -672,7 +672,7 @@ This project and its contents are proprietary and confidential. Unauthorized cop
 - **Usage**: This software is for demonstration and portfolio purposes only
 - **Restrictions**: No part of this project may be reproduced, distributed, or transmitted in any form without prior written permission
 
-For licensing inquiries, please contact: hk@hopstechinnovation.com
+For licensing inquiries, please contact: hk@hopstecinnovation.com
 
 ## 🙏 Acknowledgments
 
