@@ -67,7 +67,10 @@ export const magicLinkRouter = router({
         };
       } catch (error) {
         console.error("[MagicLink] Failed to send email:", error);
-        throw new Error("Failed to send magic link email. Please try again.");
+
+        // Preserve the original error message for better debugging
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(`Failed to send magic link email: ${errorMessage}`);
       }
     }),
 
