@@ -1146,7 +1146,6 @@ import { z as z5 } from "zod";
 
 // server/emailService.ts
 import { Resend } from "resend";
-import nodemailer from "nodemailer";
 var getResendClient = () => {
   const apiKey = process.env.RESEND_API_KEY;
   const isDevelopment = process.env.NODE_ENV === "development";
@@ -1174,7 +1173,13 @@ var getResendClient = () => {
 async function sendMagicLinkEmail(data) {
   const resend = getResendClient();
   const isDevelopment = process.env.NODE_ENV === "development";
-  const fromEmail = process.env.EMAIL_FROM_NOREPLY || "noreply@hopstecinnovation.com";
+  const fromEmail = "noreply@hopstecinnovation.com";
+  console.log("[Email] sendMagicLinkEmail called:", {
+    to: data.to,
+    hasResendClient: !!resend,
+    isDevelopment,
+    fromEmail
+  });
   if (!resend) {
     if (isDevelopment) {
       console.log("\n==============================================");
@@ -1313,22 +1318,14 @@ If you didn't request this email, you can safely ignore it.
     throw new Error(`Email sending failed: ${errorMessage}`);
   }
 }
-var createSMTPTransporter = () => {
-  const config = {
-    host: process.env.SMTP_HOST || "smtppro.zoho.eu",
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  };
-  return nodemailer.createTransport(config);
-};
 async function sendContactEmail(data) {
-  const transporter = createSMTPTransporter();
+  const resend = getResendClient();
   const adminEmail = process.env.EMAIL_ADMIN || "hk@hopstecinnovation.com";
-  const fromEmail = process.env.EMAIL_FROM_INFO || "info@hopstecinnovation.com";
+  const fromEmail = "noreply@hopstecinnovation.com";
+  if (!resend) {
+    console.error("[Email] Resend client not available for contact email");
+    throw new Error("Email service not configured");
+  }
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -1380,24 +1377,42 @@ ${data.message}
 This email was sent from the HOPSTECH INNOVATION contact form.
   `.trim();
   try {
-    await transporter.sendMail({
-      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+    console.log("[Email] Attempting to send contact form email via Resend:", {
+      from: fromEmail,
       to: adminEmail,
+      replyTo: data.email,
+      subject: `Contact Form: ${data.subject}`
+    });
+    const { data: emailData, error } = await resend.emails.send({
+      from: `HOPSTECH INNOVATION <${fromEmail}>`,
+      to: [adminEmail],
       replyTo: data.email,
       subject: `Contact Form: ${data.subject}`,
       text: textContent,
       html: htmlContent
     });
-    console.log("[Email] Contact form email sent successfully");
+    if (error) {
+      throw new Error(error.message);
+    }
+    console.log("[Email] Contact form email sent successfully:", {
+      emailId: emailData?.id
+    });
   } catch (error) {
-    console.error("[Email] Failed to send contact form email:", error);
+    console.error("[Email] Failed to send contact form email:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : void 0
+    });
     throw new Error(`Failed to send contact form email: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
 async function sendProjectInquiryEmail(data) {
-  const transporter = createSMTPTransporter();
+  const resend = getResendClient();
   const adminEmail = process.env.EMAIL_ADMIN || "hk@hopstecinnovation.com";
-  const fromEmail = process.env.EMAIL_FROM_INFO || "info@hopstecinnovation.com";
+  const fromEmail = "noreply@hopstecinnovation.com";
+  if (!resend) {
+    console.error("[Email] Resend client not available for project inquiry email");
+    throw new Error("Email service not configured");
+  }
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -1459,17 +1474,31 @@ ${data.description}
 This email was sent from the HOPSTECH INNOVATION client portal.
   `.trim();
   try {
-    await transporter.sendMail({
-      from: `"HOPSTECH INNOVATION" <${fromEmail}>`,
+    console.log("[Email] Attempting to send project inquiry email via Resend:", {
+      from: fromEmail,
       to: adminEmail,
+      replyTo: data.email,
+      subject: `Project Inquiry: ${data.projectType} - ${data.name}`
+    });
+    const { data: emailData, error } = await resend.emails.send({
+      from: `HOPSTECH INNOVATION <${fromEmail}>`,
+      to: [adminEmail],
       replyTo: data.email,
       subject: `Project Inquiry: ${data.projectType} - ${data.name}`,
       text: textContent,
       html: htmlContent
     });
-    console.log("[Email] Project inquiry email sent successfully");
+    if (error) {
+      throw new Error(error.message);
+    }
+    console.log("[Email] Project inquiry email sent successfully:", {
+      emailId: emailData?.id
+    });
   } catch (error) {
-    console.error("[Email] Failed to send project inquiry email:", error);
+    console.error("[Email] Failed to send project inquiry email:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : void 0
+    });
     throw new Error(`Failed to send project inquiry email: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
