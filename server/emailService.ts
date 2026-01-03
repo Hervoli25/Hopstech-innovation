@@ -1,7 +1,7 @@
 /**
  * Email service for sending magic link emails
  * Uses Resend for reliable email delivery in serverless environments
- * Falls back to console logging in development if API key is not configured
+ 
  */
 
 import { Resend } from 'resend';
