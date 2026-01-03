@@ -1856,34 +1856,60 @@ import nodemailer from "nodemailer";
 var createTransporter = () => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
-  const emailHost = process.env.EMAIL_HOST || "smtp.zoho.eu";
+  const emailHost = process.env.EMAIL_HOST || "smtppro.zoho.eu";
   const emailPort = parseInt(process.env.EMAIL_PORT || "587");
+  const isDevelopment = process.env.NODE_ENV === "development";
+  if (isDevelopment) {
+    console.log("[Email] Configuration check:", {
+      emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : "NOT SET",
+      emailPass: emailPass ? "***SET***" : "NOT SET",
+      emailHost,
+      emailPort,
+      nodeEnv: process.env.NODE_ENV
+    });
+  }
   if (!emailUser || !emailPass) {
     console.warn("[Email] Email credentials not configured. Emails will not be sent.");
     return null;
   }
-  return nodemailer.createTransport({
-    host: emailHost,
-    port: emailPort,
-    secure: false,
-    // true for 465, false for other ports
-    auth: {
-      user: emailUser,
-      pass: emailPass
+  try {
+    const transporter = nodemailer.createTransport({
+      host: emailHost,
+      port: emailPort,
+      secure: false,
+      // true for 465, false for other ports
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      },
+      logger: isDevelopment,
+      // Enable logging only in development
+      debug: isDevelopment
+      // Enable debug output only in development
+    });
+    if (isDevelopment) {
+      console.log("[Email] Transporter created successfully");
     }
-  });
+    return transporter;
+  } catch (error) {
+    console.error("[Email] Failed to create transporter:", error);
+    throw error;
+  }
 };
 async function sendMagicLinkEmail(data) {
   const transporter = createTransporter();
+  const isDevelopment = process.env.NODE_ENV === "development";
   if (!transporter) {
-    console.log("\n==============================================");
-    console.log("\u{1F510} MAGIC LINK (Development Mode)");
-    console.log("==============================================");
-    console.log(`To: ${data.to}`);
-    console.log(`Name: ${data.name}`);
-    console.log(`Link: ${data.magicLink}`);
-    console.log(`Expires in: ${data.expiresInMinutes} minutes`);
-    console.log("==============================================\n");
+    if (isDevelopment) {
+      console.log("\n==============================================");
+      console.log("\u{1F510} MAGIC LINK (Development Mode)");
+      console.log("==============================================");
+      console.log(`To: ${data.to}`);
+      console.log(`Name: ${data.name}`);
+      console.log(`Link: ${data.magicLink}`);
+      console.log(`Expires in: ${data.expiresInMinutes} minutes`);
+      console.log("==============================================\n");
+    }
     return;
   }
   const htmlContent = `
@@ -1980,17 +2006,33 @@ If you didn't request this email, you can safely ignore it.
 \xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} HOPSTECH INNOVATION
   `.trim();
   try {
-    await transporter.sendMail({
+    if (isDevelopment) {
+      console.log(`[Email] Attempting to send magic link to ${data.to}`);
+    }
+    const info = await transporter.sendMail({
       from: `"HOPSTECH INNOVATION" <${process.env.EMAIL_USER}>`,
       to: data.to,
       subject: "\u{1F510} Sign in to HOPSTECH INNOVATION Client Portal",
       text: textContent,
       html: htmlContent
     });
-    console.log(`[Email] Magic link sent to ${data.to}`);
+    if (isDevelopment) {
+      console.log(`[Email] Magic link sent successfully to ${data.to}`, {
+        messageId: info.messageId,
+        response: info.response
+      });
+    } else {
+      console.log("[Email] Magic link sent successfully", {
+        messageId: info.messageId
+      });
+    }
   } catch (error) {
-    console.error("[Email] Failed to send magic link:", error);
-    throw error;
+    console.error("[Email] Failed to send magic link:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: isDevelopment && error instanceof Error ? error.stack : void 0
+    });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Email sending failed: ${errorMessage}`);
   }
 }
 
@@ -2120,6 +2162,51 @@ var magicLinkRouter = router({
   })
 });
 
+// server/testEmailRouter.ts
+var testEmailRouter = router({
+  // Test email configuration
+  testConfig: publicProcedure.query(async () => {
+    const config = {
+      emailUser: process.env.EMAIL_USER ? "SET" : "NOT SET",
+      emailPass: process.env.EMAIL_PASS ? "SET" : "NOT SET",
+      emailHost: process.env.EMAIL_HOST || "NOT SET",
+      emailPort: process.env.EMAIL_PORT || "NOT SET",
+      nodeEnv: process.env.NODE_ENV || "NOT SET"
+    };
+    return {
+      success: true,
+      config,
+      message: "Email configuration check"
+    };
+  }),
+  // Test SMTP connection
+  testConnection: publicProcedure.mutation(async () => {
+    try {
+      const nodemailer2 = await import("nodemailer");
+      const transporter = nodemailer2.default.createTransport({
+        host: process.env.EMAIL_HOST || "smtppro.zoho.eu",
+        port: parseInt(process.env.EMAIL_PORT || "587"),
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+      await transporter.verify();
+      return {
+        success: true,
+        message: "SMTP connection successful"
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        message: "SMTP connection failed"
+      };
+    }
+  })
+});
+
 // server/routers.ts
 var appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -2140,7 +2227,9 @@ var appRouter = router({
   testimonials: testimonialRouter,
   contact: contactRouter,
   clientPortal: clientPortalRouter,
-  magicLink: magicLinkRouter
+  magicLink: magicLinkRouter,
+  // Test router (remove in production)
+  testEmail: testEmailRouter
 });
 
 // server/_core/context.ts
