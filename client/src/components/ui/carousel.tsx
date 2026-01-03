@@ -56,17 +56,19 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
-  const autoplayPlugin = React.useRef(
-    Autoplay({ delay: autoplayDelay, stopOnInteraction: false })
+  // Create autoplay plugin only if autoplay is enabled
+  const autoplayPlugin = React.useMemo(
+    () => autoplay ? Autoplay({ delay: autoplayDelay, stopOnInteraction: false, stopOnMouseEnter: true }) : null,
+    [autoplay, autoplayDelay]
   );
 
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
-      loop: true, // Enable looping for better autoplay experience
+      loop: autoplay ? true : (opts?.loop ?? false), // Enable looping for autoplay
     },
-    autoplay ? [autoplayPlugin.current, ...(plugins || [])] : plugins
+    autoplayPlugin ? [autoplayPlugin, ...(plugins || [])] : plugins
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -98,17 +100,6 @@ function Carousel({
     },
     [scrollPrev, scrollNext]
   );
-
-  // Handle autoplay pause on hover
-  React.useEffect(() => {
-    if (!autoplay || !autoplayPlugin.current) return;
-
-    if (isHovered) {
-      autoplayPlugin.current.stop();
-    } else {
-      autoplayPlugin.current.play();
-    }
-  }, [isHovered, autoplay]);
 
   React.useEffect(() => {
     if (!api || !setApi) return;
@@ -146,8 +137,6 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"
