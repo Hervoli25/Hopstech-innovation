@@ -67,23 +67,25 @@
         async function testConfig() {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '<div class="result">Testing configuration...</div>';
-            
+
             try {
-                const response = await fetch('/api/testEmail.testConfig');
+                // tRPC query endpoint format: /api/trpc/testEmail.testConfig
+                const response = await fetch('/api/trpc/testEmail.testConfig');
                 const data = await response.json();
-                
+
                 resultDiv.innerHTML = `<div class="result success">${JSON.stringify(data, null, 2)}</div>`;
             } catch (error) {
-                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}\n\nStack: ${error.stack}</div>`;
             }
         }
 
         async function testConnection() {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = '<div class="result">Testing SMTP connection...</div>';
-            
+
             try {
-                const response = await fetch('/api/testEmail.testConnection', {
+                // tRPC mutation endpoint format: /api/trpc/testEmail.testConnection
+                const response = await fetch('/api/trpc/testEmail.testConnection', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -91,11 +93,11 @@
                     body: JSON.stringify({}),
                 });
                 const data = await response.json();
-                
+
                 const className = data.result?.success ? 'success' : 'error';
                 resultDiv.innerHTML = `<div class="result ${className}">${JSON.stringify(data, null, 2)}</div>`;
             } catch (error) {
-                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="result error">Error: ${error.message}\n\nStack: ${error.stack}</div>`;
             }
         }
     </script>

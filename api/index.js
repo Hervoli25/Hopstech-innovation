@@ -1852,54 +1852,36 @@ import { z as z7 } from "zod";
 import { nanoid } from "nanoid";
 
 // server/emailService.ts
-import nodemailer from "nodemailer";
-var createTransporter = () => {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-  const emailHost = process.env.EMAIL_HOST || "smtppro.zoho.eu";
-  const emailPort = parseInt(process.env.EMAIL_PORT || "587");
+import { Resend } from "resend";
+var getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
   const isDevelopment = process.env.NODE_ENV === "development";
   if (isDevelopment) {
     console.log("[Email] Configuration check:", {
-      emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : "NOT SET",
-      emailPass: emailPass ? "***SET***" : "NOT SET",
-      emailHost,
-      emailPort,
+      resendApiKey: apiKey ? "***SET***" : "NOT SET",
       nodeEnv: process.env.NODE_ENV
     });
   }
-  if (!emailUser || !emailPass) {
-    console.warn("[Email] Email credentials not configured. Emails will not be sent.");
+  if (!apiKey) {
+    console.warn("[Email] Resend API key not configured. Emails will not be sent.");
     return null;
   }
   try {
-    const transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: emailPort,
-      secure: false,
-      // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPass
-      },
-      logger: isDevelopment,
-      // Enable logging only in development
-      debug: isDevelopment
-      // Enable debug output only in development
-    });
+    const resend = new Resend(apiKey);
     if (isDevelopment) {
-      console.log("[Email] Transporter created successfully");
+      console.log("[Email] Resend client initialized successfully");
     }
-    return transporter;
+    return resend;
   } catch (error) {
-    console.error("[Email] Failed to create transporter:", error);
+    console.error("[Email] Failed to initialize Resend client:", error);
     throw error;
   }
 };
 async function sendMagicLinkEmail(data) {
-  const transporter = createTransporter();
+  const resend = getResendClient();
   const isDevelopment = process.env.NODE_ENV === "development";
-  if (!transporter) {
+  const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
+  if (!resend) {
     if (isDevelopment) {
       console.log("\n==============================================");
       console.log("\u{1F510} MAGIC LINK (Development Mode)");
@@ -2007,23 +1989,25 @@ If you didn't request this email, you can safely ignore it.
   `.trim();
   try {
     if (isDevelopment) {
-      console.log(`[Email] Attempting to send magic link to ${data.to}`);
+      console.log(`[Email] Attempting to send magic link via Resend to ${data.to}`);
     }
-    const info = await transporter.sendMail({
-      from: `"HOPSTECH INNOVATION" <${process.env.EMAIL_USER}>`,
-      to: data.to,
+    const { data: emailData, error } = await resend.emails.send({
+      from: `HOPSTECH INNOVATION <${fromEmail}>`,
+      to: [data.to],
       subject: "\u{1F510} Sign in to HOPSTECH INNOVATION Client Portal",
       text: textContent,
       html: htmlContent
     });
+    if (error) {
+      throw new Error(error.message);
+    }
     if (isDevelopment) {
       console.log(`[Email] Magic link sent successfully to ${data.to}`, {
-        messageId: info.messageId,
-        response: info.response
+        emailId: emailData?.id
       });
     } else {
       console.log("[Email] Magic link sent successfully", {
-        messageId: info.messageId
+        emailId: emailData?.id
       });
     }
   } catch (error) {
@@ -2078,7 +2062,8 @@ var magicLinkRouter = router({
       };
     } catch (error) {
       console.error("[MagicLink] Failed to send email:", error);
-      throw new Error("Failed to send magic link email. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to send magic link email: ${errorMessage}`);
     }
   }),
   // Verify magic link token
@@ -2163,45 +2148,56 @@ var magicLinkRouter = router({
 });
 
 // server/testEmailRouter.ts
+import { Resend as Resend2 } from "resend";
 var testEmailRouter = router({
   // Test email configuration
   testConfig: publicProcedure.query(async () => {
     const config = {
-      emailUser: process.env.EMAIL_USER ? "SET" : "NOT SET",
-      emailPass: process.env.EMAIL_PASS ? "SET" : "NOT SET",
-      emailHost: process.env.EMAIL_HOST || "NOT SET",
-      emailPort: process.env.EMAIL_PORT || "NOT SET",
+      resendApiKey: process.env.RESEND_API_KEY ? "SET" : "NOT SET",
+      emailFrom: process.env.EMAIL_FROM || "onboarding@resend.dev",
       nodeEnv: process.env.NODE_ENV || "NOT SET"
     };
     return {
       success: true,
       config,
-      message: "Email configuration check"
+      message: "Resend email configuration check"
     };
   }),
-  // Test SMTP connection
+  // Test Resend API connection
   testConnection: publicProcedure.mutation(async () => {
     try {
-      const nodemailer2 = await import("nodemailer");
-      const transporter = nodemailer2.default.createTransport({
-        host: process.env.EMAIL_HOST || "smtppro.zoho.eu",
-        port: parseInt(process.env.EMAIL_PORT || "587"),
-        secure: false,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
+      const apiKey = process.env.RESEND_API_KEY;
+      if (!apiKey) {
+        return {
+          success: false,
+          error: "RESEND_API_KEY not configured",
+          message: "Resend API key missing"
+        };
+      }
+      const resend = new Resend2(apiKey);
+      const { data, error } = await resend.emails.send({
+        from: `Test <${process.env.EMAIL_FROM || "onboarding@resend.dev"}>`,
+        to: [process.env.EMAIL_FROM || "onboarding@resend.dev"],
+        subject: "Resend API Test",
+        html: "<p>This is a test email from HOPSTECH INNOVATION</p>"
       });
-      await transporter.verify();
+      if (error) {
+        return {
+          success: false,
+          error: error.message,
+          message: "Resend API test failed"
+        };
+      }
       return {
         success: true,
-        message: "SMTP connection successful"
+        message: "Resend API connection successful",
+        emailId: data?.id
       };
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        message: "SMTP connection failed"
+        message: "Resend API test failed"
       };
     }
   })

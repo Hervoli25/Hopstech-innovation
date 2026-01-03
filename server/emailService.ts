@@ -1,63 +1,55 @@
-import nodemailer from 'nodemailer';
+/**
+ * Email service for sending magic link emails
+ * Uses Resend for reliable email delivery in serverless environments
+ * Falls back to console logging in development if API key is not configured
+ */
 
-interface MagicLinkEmailData {
+import { Resend } from 'resend';
+
+export interface MagicLinkEmailData {
   to: string;
   name: string;
   magicLink: string;
   expiresInMinutes: number;
 }
 
-// Create reusable transporter
-const createTransporter = () => {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-  const emailHost = process.env.EMAIL_HOST || 'smtppro.zoho.eu';
-  const emailPort = parseInt(process.env.EMAIL_PORT || '587');
+// Initialize Resend client
+const getResendClient = () => {
+  const apiKey = process.env.RESEND_API_KEY;
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   if (isDevelopment) {
     console.log('[Email] Configuration check:', {
-      emailUser: emailUser ? `${emailUser.substring(0, 3)}***` : 'NOT SET',
-      emailPass: emailPass ? '***SET***' : 'NOT SET',
-      emailHost,
-      emailPort,
+      resendApiKey: apiKey ? '***SET***' : 'NOT SET',
       nodeEnv: process.env.NODE_ENV,
     });
   }
 
-  if (!emailUser || !emailPass) {
-    console.warn('[Email] Email credentials not configured. Emails will not be sent.');
+  if (!apiKey) {
+    console.warn('[Email] Resend API key not configured. Emails will not be sent.');
     return null;
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: emailPort,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
-      logger: isDevelopment, // Enable logging only in development
-      debug: isDevelopment, // Enable debug output only in development
-    });
+    const resend = new Resend(apiKey);
 
     if (isDevelopment) {
-      console.log('[Email] Transporter created successfully');
+      console.log('[Email] Resend client initialized successfully');
     }
-    return transporter;
+
+    return resend;
   } catch (error) {
-    console.error('[Email] Failed to create transporter:', error);
+    console.error('[Email] Failed to initialize Resend client:', error);
     throw error;
   }
 };
 
 export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void> {
-  const transporter = createTransporter();
+  const resend = getResendClient();
   const isDevelopment = process.env.NODE_ENV === 'development';
+  const fromEmail = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
-  if (!transporter) {
+  if (!resend) {
     // In development, just log the magic link
     if (isDevelopment) {
       console.log('\n==============================================');
@@ -169,25 +161,28 @@ If you didn't request this email, you can safely ignore it.
 
   try {
     if (isDevelopment) {
-      console.log(`[Email] Attempting to send magic link to ${data.to}`);
+      console.log(`[Email] Attempting to send magic link via Resend to ${data.to}`);
     }
 
-    const info = await transporter.sendMail({
-      from: `"HOPSTECH INNOVATION" <${process.env.EMAIL_USER}>`,
-      to: data.to,
+    const { data: emailData, error } = await resend.emails.send({
+      from: `HOPSTECH INNOVATION <${fromEmail}>`,
+      to: [data.to],
       subject: '🔐 Sign in to HOPSTECH INNOVATION Client Portal',
       text: textContent,
       html: htmlContent,
     });
 
+    if (error) {
+      throw new Error(error.message);
+    }
+
     if (isDevelopment) {
       console.log(`[Email] Magic link sent successfully to ${data.to}`, {
-        messageId: info.messageId,
-        response: info.response,
+        emailId: emailData?.id,
       });
     } else {
       console.log('[Email] Magic link sent successfully', {
-        messageId: info.messageId,
+        emailId: emailData?.id,
       });
     }
   } catch (error) {
