@@ -36,30 +36,29 @@ export interface ProjectInquiryEmailData {
 // Initialize Resend client
 const getResendClient = () => {
   const apiKey = process.env.RESEND_API_KEY;
-  const isDevelopment = process.env.NODE_ENV === 'development';
 
-  if (isDevelopment) {
-    console.log('[Email] Configuration check:', {
-      resendApiKey: apiKey ? '***SET***' : 'NOT SET',
-      nodeEnv: process.env.NODE_ENV,
-    });
-  }
+  // Always log configuration check (important for production debugging)
+  console.log('[Email] Resend configuration check:', {
+    hasApiKey: !!apiKey,
+    apiKeyLength: apiKey?.length || 0,
+    nodeEnv: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+  });
 
   if (!apiKey) {
-    console.warn('[Email] Resend API key not configured. Emails will not be sent.');
+    console.error('[Email] CRITICAL: Resend API key not configured. Emails will not be sent.');
     return null;
   }
 
   try {
     const resend = new Resend(apiKey);
-
-    if (isDevelopment) {
-      console.log('[Email] Resend client initialized successfully');
-    }
-
+    console.log('[Email] Resend client initialized successfully');
     return resend;
   } catch (error) {
-    console.error('[Email] Failed to initialize Resend client:', error);
+    console.error('[Email] CRITICAL: Failed to initialize Resend client:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw error;
   }
 };

@@ -44,6 +44,12 @@ export const contactRouter = router({
       });
 
       // Send email notification to admin
+      console.log('[Contact] Attempting to send email notification for:', {
+        name: input.name,
+        email: input.email,
+        subject: input.subject,
+      });
+
       try {
         await sendContactEmail({
           name: input.name,
@@ -53,8 +59,12 @@ export const contactRouter = router({
           message: input.message,
           phone: input.phone,
         });
+        console.log('[Contact] Email notification sent successfully');
       } catch (error) {
-        console.error('[Contact] Failed to send email notification:', error);
+        console.error('[Contact] Failed to send email notification:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
         // Don't fail the request if email fails, contact is already saved in DB
       }
 
