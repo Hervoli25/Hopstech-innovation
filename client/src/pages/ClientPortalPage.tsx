@@ -29,6 +29,7 @@ const ClientPortalPage = () => {
 
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [magicLinkName, setMagicLinkName] = useState('');
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   const inquiryMutation = trpc.clientPortal.submitInquiry.useMutation({
     onSuccess: () => {
@@ -52,8 +53,7 @@ const ClientPortalPage = () => {
   const magicLinkMutation = trpc.magicLink.requestMagicLink.useMutation({
     onSuccess: () => {
       toast.success('Magic link sent! Check your email to sign in.');
-      setMagicLinkEmail('');
-      setMagicLinkName('');
+      setMagicLinkSent(true);
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to send magic link. Please try again.');
@@ -209,54 +209,112 @@ const ClientPortalPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="magicLinkName" className="text-white">
-                      Your Name
-                    </Label>
-                    <Input
-                      id="magicLinkName"
-                      type="text"
-                      value={magicLinkName}
-                      onChange={(e) => setMagicLinkName(e.target.value)}
-                      className="bg-slate-900 border-slate-700 text-white"
-                      placeholder="John Doe"
-                    />
-                  </div>
+                {magicLinkSent ? (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-0.5">
+                          <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-semibold mb-1">Magic Link Sent!</h3>
+                          <p className="text-gray-300 text-sm mb-2">
+                            We've sent a secure sign-in link to <strong className="text-white">{magicLinkEmail}</strong>
+                          </p>
+                          <p className="text-gray-400 text-xs">
+                            Check your inbox and click the link to access your client portal. The link will expire in 15 minutes.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="magicLinkEmail" className="text-white">
-                      Email Address <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="magicLinkEmail"
-                      type="email"
-                      value={magicLinkEmail}
-                      onChange={(e) => setMagicLinkEmail(e.target.value)}
-                      required
-                      className="bg-slate-900 border-slate-700 text-white"
-                      placeholder="your@email.com"
-                    />
-                  </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          magicLinkMutation.mutate({ email: magicLinkEmail, name: magicLinkName });
+                        }}
+                        variant="outline"
+                        className="flex-1 border-slate-700 text-white hover:bg-slate-800"
+                        disabled={magicLinkMutation.isPending}
+                      >
+                        {magicLinkMutation.isPending ? (
+                          <>
+                            <span className="animate-spin mr-2">⏳</span>
+                            Resending...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Resend Link
+                          </>
+                        )}
+                      </Button>
 
-                  <Button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    disabled={magicLinkMutation.isPending}
-                  >
-                    {magicLinkMutation.isPending ? (
-                      <>
-                        <span className="animate-spin mr-2">⏳</span>
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Send Magic Link
-                      </>
-                    )}
-                  </Button>
-                </form>
+                      <Button
+                        onClick={() => {
+                          setMagicLinkSent(false);
+                          setMagicLinkEmail('');
+                          setMagicLinkName('');
+                        }}
+                        variant="ghost"
+                        className="text-gray-400 hover:text-white hover:bg-slate-800"
+                      >
+                        Use Different Email
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="magicLinkName" className="text-white">
+                        Your Name
+                      </Label>
+                      <Input
+                        id="magicLinkName"
+                        type="text"
+                        value={magicLinkName}
+                        onChange={(e) => setMagicLinkName(e.target.value)}
+                        className="bg-slate-900 border-slate-700 text-white"
+                        placeholder="John Doe"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="magicLinkEmail" className="text-white">
+                        Email Address <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="magicLinkEmail"
+                        type="email"
+                        value={magicLinkEmail}
+                        onChange={(e) => setMagicLinkEmail(e.target.value)}
+                        required
+                        className="bg-slate-900 border-slate-700 text-white"
+                        placeholder="your@email.com"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      disabled={magicLinkMutation.isPending}
+                    >
+                      {magicLinkMutation.isPending ? (
+                        <>
+                          <span className="animate-spin mr-2">⏳</span>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="mr-2 h-4 w-4" />
+                          Send Magic Link
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
               </CardContent>
             </Card>
           </div>
