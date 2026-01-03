@@ -47,10 +47,18 @@ export const magicLinkRouter = router({
       });
 
       // Generate magic link URL
-      const origin = ctx.req?.headers?.origin || 
+      const origin = ctx.req?.headers?.origin ||
                      ctx.req?.headers?.referer?.replace(/\/$/, '') ||
-                     'http://localhost:3000';
+                     process.env.APP_URL ||
+                     'https://hopstecinnovation.com';
       const magicLinkUrl = `${origin}/auth/verify?token=${token}`;
+
+      console.log('[MagicLink] Generated magic link:', {
+        origin,
+        hasOriginHeader: !!ctx.req?.headers?.origin,
+        hasRefererHeader: !!ctx.req?.headers?.referer,
+        usedAppUrl: !ctx.req?.headers?.origin && !ctx.req?.headers?.referer,
+      });
 
       // Send email with magic link
       try {

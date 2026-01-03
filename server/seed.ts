@@ -94,43 +94,69 @@ async function seed() {
         publishedAt: new Date("2024-03-20")
       },
       {
-        title: "Ekhaya - Property Management Platform",
-        slug: "ekhaya-property-management",
-        description: "Modern property management and tenant communication platform",
-        longDescription: `Ekhaya is a comprehensive property management solution that streamlines operations for property managers, landlords, and tenants. The platform includes rent collection, maintenance tracking, and automated communication features.
-        
-        **Challenge:** Property managers were using multiple disconnected tools, leading to communication gaps and operational inefficiencies.
-        
-        **Solution:** We created an all-in-one platform with integrated payment processing, automated notifications, maintenance request tracking, and tenant portals.
-        
-        **Results:** 80% reduction in administrative time, 95% on-time rent collection rate, and significantly improved tenant satisfaction.`,
-        thumbnail: "/images/projects/ekhaya-thumbnail.jpg",
+        title: "PRESTIGE Car Wash",
+        slug: "prestige-car-wash",
+        description: "Enterprise Car Wash Service Management Platform",
+        longDescription: `PRESTIGE Car Wash is a comprehensive, enterprise-grade car wash service platform delivering seamless booking experiences, intelligent membership management, and integrated payment processing for modern car wash businesses.
+
+**Overview**
+
+A full-featured business management solution designed specifically for premium car wash operations. The platform combines cutting-edge web technologies with intuitive design to provide an exceptional experience for both customers and business operators.
+
+**Challenge**
+
+Traditional car wash businesses struggled with manual booking systems, inefficient customer management, and fragmented payment processing. Customers faced long wait times and lacked transparency in service tracking, while business owners had no centralized system for analytics and operations management.
+
+**Solution**
+
+We developed a comprehensive platform featuring:
+• Smart booking system with real-time availability and intelligent scheduling
+• Digital membership cards with QR codes and loyalty points tracking
+• Secure Stripe payment integration with saved payment methods
+• Real-time SMS and email notifications for confirmations and reminders
+• Mobile-first responsive design optimized for all devices
+• Analytics dashboard with comprehensive business intelligence
+• Customer management with detailed profiles and interaction history
+• Dynamic service configuration and pricing management
+• Staff coordination with booking assignments and schedule management
+
+**Results**
+
+The platform successfully transformed the car wash business operations, resulting in streamlined customer experiences, improved operational efficiency, and enhanced revenue tracking. The digital membership system increased customer retention, while automated notifications reduced no-shows significantly.`,
+        thumbnail: "/showcase/Ekhaya1.png",
         images: [
-          "/images/projects/ekhaya-1.jpg",
-          "/images/projects/ekhaya-2.jpg",
-          "/images/projects/ekhaya-3.jpg"
+          "/showcase/Ekhaya1.png",
+          "/showcase/Ekhaya2.png",
+          "/showcase/Ekhaya3.png",
+          "/showcase/Ekhaya4.png"
         ] as any,
         technologies: [
-          "Next.js",
+          "Next.js 14",
           "TypeScript",
-          "Prisma",
-          "PostgreSQL",
-          "Stripe",
           "Tailwind CSS",
-          "Vercel"
+          "Radix UI",
+          "Framer Motion",
+          "Prisma ORM",
+          "PostgreSQL",
+          "NextAuth.js",
+          "Stripe",
+          "Nodemailer",
+          "Twilio",
+          "Vercel",
+          "Neon PostgreSQL"
         ] as any,
         category: "Full-Stack Development",
-        client: "Property Solutions Ltd",
-        url: "https://ekhaya-demo.example.com",
+        client: "PRESTIGE by Ekhaya",
+        url: "https://www.prestigebyekhaya.com",
         featured: true,
         order: 3,
         metrics: {
-          "Admin Time Saved": "80%",
-          "Rent Collection Rate": "95%",
-          "Tenant Satisfaction": "4.7/5",
-          "Response Time": "2 hours avg"
+          "Customer Retention": "+45%",
+          "Booking Efficiency": "85%",
+          "Payment Success Rate": "99.2%",
+          "User Satisfaction": "4.9/5"
         } as any,
-        publishedAt: new Date("2024-06-10")
+        publishedAt: new Date("2024-11-15")
       }
     ]);
 

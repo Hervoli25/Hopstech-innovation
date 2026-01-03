@@ -2,6 +2,7 @@ import * as React from "react";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ type CarouselProps = {
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
+  autoplay?: boolean;
+  autoplayDelay?: number;
 };
 
 type CarouselContextProps = {
@@ -26,6 +29,8 @@ type CarouselContextProps = {
   scrollNext: () => void;
   canScrollPrev: boolean;
   canScrollNext: boolean;
+  isHovered: boolean;
+  setIsHovered: (hovered: boolean) => void;
 } & CarouselProps;
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
@@ -45,19 +50,27 @@ function Carousel({
   opts,
   setApi,
   plugins,
+  autoplay = false,
+  autoplayDelay = 4000,
   className,
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  const autoplayPlugin = React.useRef(
+    Autoplay({ delay: autoplayDelay, stopOnInteraction: false })
+  );
+
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
+      loop: true, // Enable looping for better autoplay experience
     },
-    plugins
+    autoplay ? [autoplayPlugin.current, ...(plugins || [])] : plugins
   );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return;
@@ -85,6 +98,17 @@ function Carousel({
     },
     [scrollPrev, scrollNext]
   );
+
+  // Handle autoplay pause on hover
+  React.useEffect(() => {
+    if (!autoplay || !autoplayPlugin.current) return;
+
+    if (isHovered) {
+      autoplayPlugin.current.stop();
+    } else {
+      autoplayPlugin.current.play();
+    }
+  }, [isHovered, autoplay]);
 
   React.useEffect(() => {
     if (!api || !setApi) return;
@@ -114,10 +138,16 @@ function Carousel({
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        isHovered,
+        setIsHovered,
+        autoplay,
+        autoplayDelay,
       }}
     >
       <div
         onKeyDownCapture={handleKeyDown}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"

@@ -4,11 +4,35 @@ import PageLayout from '../components/PageLayout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '../components/ui/carousel';
 import { trpc } from '../lib/trpc';
+import { useState, useEffect } from 'react';
 
 const ProjectDetailPage = () => {
   const params = useParams();
   const slug = params.slug as string;
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+
+  // Sync carousel with thumbnail clicks
+  useEffect(() => {
+    if (!carouselApi) return;
+    carouselApi.scrollTo(selectedImageIndex);
+  }, [selectedImageIndex, carouselApi]);
+
+  // Update selected index when carousel changes
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const onSelect = () => {
+      setSelectedImageIndex(carouselApi.selectedScrollSnap());
+    };
+
+    carouselApi.on('select', onSelect);
+    return () => {
+      carouselApi.off('select', onSelect);
+    };
+  }, [carouselApi]);
 
   const { data: project, isLoading } = trpc.projects.getBySlug.useQuery({ slug });
 
@@ -90,8 +114,74 @@ const ProjectDetailPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Project Image */}
-              {project.thumbnail && (
+              {/* Project Images Gallery */}
+              {project.images && project.images.length > 0 ? (
+                <div className="space-y-4">
+                  <Carousel
+                    className="w-full"
+                    opts={{ startIndex: selectedImageIndex }}
+                    setApi={setCarouselApi}
+                    autoplay={true}
+                    autoplayDelay={5000}
+                  >
+                    <CarouselContent>
+                      {project.images.map((image, index) => (
+                        <CarouselItem key={index}>
+                          <div className="relative aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg overflow-hidden shadow-2xl border border-slate-700/50">
+                            {/* Loading skeleton */}
+                            <div className="absolute inset-0 bg-slate-800 animate-pulse" />
+
+                            {/* Image with proper containment */}
+                            <div className="relative w-full h-full p-4 flex items-center justify-center">
+                              <img
+                                src={image}
+                                alt={`${project.title} - View ${index + 1}`}
+                                className="max-w-full max-h-full object-contain rounded shadow-lg transition-opacity duration-300"
+                                loading="lazy"
+                                onLoad={(e) => {
+                                  e.currentTarget.previousElementSibling?.classList.add('hidden');
+                                }}
+                              />
+                            </div>
+
+                            {/* Image counter overlay */}
+                            <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                              {index + 1} / {project.images.length}
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-4 bg-black/50 hover:bg-black/70 text-white border-white/20" />
+                    <CarouselNext className="right-4 bg-black/50 hover:bg-black/70 text-white border-white/20" />
+                  </Carousel>
+
+                  {/* Thumbnail Navigation */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {project.images.map((image, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`relative aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-md overflow-hidden cursor-pointer transition-all duration-200 border ${
+                          selectedImageIndex === index
+                            ? 'ring-2 ring-blue-500 scale-105 border-blue-500'
+                            : 'border-slate-700/50 hover:ring-2 hover:ring-blue-400/50 hover:scale-105 hover:border-blue-400/50'
+                        }`}
+                      >
+                        <div className="w-full h-full p-2 flex items-center justify-center">
+                          <img
+                            src={image}
+                            alt={`${project.title} - View ${index + 1}`}
+                            className="max-w-full max-h-full object-contain"
+                            loading="lazy"
+                          />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : project.thumbnail ? (
                 <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden">
                   <img
                     src={project.thumbnail}
@@ -99,7 +189,7 @@ const ProjectDetailPage = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-              )}
+              ) : null}
 
               {/* Description */}
               <Card className="bg-slate-800/50 border-slate-700">

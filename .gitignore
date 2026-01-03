@@ -2,6 +2,10 @@
 **/node_modules
 .pnpm-store/
 
+# Lock files from other package managers (using pnpm)
+package-lock.json
+yarn.lock
+
 # Build outputs
 dist/
 build/
@@ -25,6 +29,10 @@ DEPLOYMENT.md
 
 # Seed scripts that might contain sensitive data
 server/seedProjectTypes.ts
+
+# One-time migration and utility scripts
+server/update-prestige-project.ts
+verify-images.ts
 
 # IDE and editor files
 .vscode/
