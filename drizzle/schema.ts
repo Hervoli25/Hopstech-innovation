@@ -28,6 +28,15 @@ export const messageTypeEnum = pgEnum("message_type", ["text", "file", "system"]
 export const notificationTypeEnum = pgEnum("notification_type", ["project_update", "message", "invoice", "ticket", "system"]);
 export const notificationPriorityEnum = pgEnum("notification_priority", ["low", "medium", "high", "urgent"]);
 export const notificationActionTypeEnum = pgEnum("notification_action_type", ["none", "view", "approve", "respond", "download", "custom"]);
+export const changeRequestTypeEnum = pgEnum("change_request_type", ["scope", "timeline", "budget", "requirements", "other"]);
+export const changeRequestStatusEnum = pgEnum("change_request_status", ["pending", "reviewing", "approved", "rejected", "implemented"]);
+export const paymentPlanTypeEnum = pgEnum("payment_plan_type", ["milestone", "installment", "custom"]);
+export const paymentPlanStatusEnum = pgEnum("payment_plan_status", ["active", "completed", "cancelled"]);
+export const installmentStatusEnum = pgEnum("installment_status", ["pending", "paid", "overdue", "waived"]);
+export const statusChangeRequestTypeEnum = pgEnum("status_change_request_type", ["pause", "cancel", "resume", "archive"]);
+export const statusChangeRequestStatusEnum = pgEnum("status_change_request_status", ["pending", "approved", "rejected"]);
+export const phaseStatusEnum = pgEnum("phase_status", ["pending", "in_progress", "completed", "skipped"]);
+export const progressCalculationMethodEnum = pgEnum("progress_calculation_method", ["milestone", "phase", "deliverable", "hybrid", "manual"]);
 
 /**
  * Core user table backing auth flow.
@@ -406,6 +415,13 @@ export const clientProjectsExtended = pgTable("clientProjectsExtended", {
     completed: boolean;
   }>>().default([]),
   metadata: jsonb("metadata").$type<Record<string, any>>(),
+  // Enhanced progress tracking fields
+  progressCalculationMethod: progressCalculationMethodEnum("progressCalculationMethod").default("hybrid"),
+  autoProgressTracking: boolean("autoProgressTracking").default(true).notNull(),
+  currentPhaseId: integer("currentPhaseId"), // References projectPhases.id (no FK to avoid circular dependency)
+  paymentPlanId: integer("paymentPlanId"), // References paymentPlans.id (no FK to avoid circular dependency)
+  lastProgressUpdate: timestamp("lastProgressUpdate", { mode: "date", withTimezone: true }),
+  lastProgressUpdateBy: integer("lastProgressUpdateBy").references(() => users.id),
   createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp("completedAt", { mode: "date", withTimezone: true }),
@@ -413,6 +429,7 @@ export const clientProjectsExtended = pgTable("clientProjectsExtended", {
   userIdIdx: index("client_projects_ext_user_id_idx").on(table.userId),
   statusIdx: index("client_projects_ext_status_idx").on(table.status),
   createdAtIdx: index("client_projects_ext_created_at_idx").on(table.createdAt),
+  currentPhaseIdIdx: index("client_projects_ext_current_phase_id_idx").on(table.currentPhaseId),
 }));
 
 export type ClientProjectExtended = typeof clientProjectsExtended.$inferSelect;
@@ -643,3 +660,144 @@ export const activityLog = pgTable("activityLog", {
 
 export type ActivityLog = typeof activityLog.$inferSelect;
 export type InsertActivityLog = typeof activityLog.$inferInsert;
+
+/**
+ * Project Phases table - tracks project phases and their progress
+ */
+export const projectPhases = pgTable("projectPhases", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  weight: integer("weight").default(0).notNull(), // Percentage of total project (0-100)
+  status: phaseStatusEnum("status").default("pending").notNull(),
+  progress: integer("progress").default(0).notNull(), // 0-100
+  orderIndex: integer("orderIndex").default(0).notNull(),
+  startDate: timestamp("startDate", { mode: "date", withTimezone: true }),
+  endDate: timestamp("endDate", { mode: "date", withTimezone: true }),
+  milestoneIds: jsonb("milestoneIds").$type<string[]>().default([]),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  projectIdIdx: index("project_phases_project_id_idx").on(table.projectId),
+  statusIdx: index("project_phases_status_idx").on(table.status),
+  orderIdx: index("project_phases_order_idx").on(table.orderIndex),
+}));
+
+export type ProjectPhase = typeof projectPhases.$inferSelect;
+export type InsertProjectPhase = typeof projectPhases.$inferInsert;
+
+/**
+ * Change Requests table - tracks client requests for project modifications
+ */
+export const changeRequests = pgTable("changeRequests", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  requestedBy: integer("requestedBy").notNull().references(() => users.id),
+  type: changeRequestTypeEnum("type").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  currentValue: jsonb("currentValue").$type<any>(),
+  proposedValue: jsonb("proposedValue").$type<any>(),
+  impactAssessment: jsonb("impactAssessment").$type<{
+    timelineImpact?: string;
+    budgetImpact?: number;
+    scopeImpact?: string;
+    riskLevel?: 'low' | 'medium' | 'high';
+  }>(),
+  status: changeRequestStatusEnum("status").default("pending").notNull(),
+  adminNotes: text("adminNotes"),
+  reviewedBy: integer("reviewedBy").references(() => users.id),
+  reviewedAt: timestamp("reviewedAt", { mode: "date", withTimezone: true }),
+  implementedAt: timestamp("implementedAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  projectIdIdx: index("change_requests_project_id_idx").on(table.projectId),
+  requestedByIdx: index("change_requests_requested_by_idx").on(table.requestedBy),
+  statusIdx: index("change_requests_status_idx").on(table.status),
+  typeIdx: index("change_requests_type_idx").on(table.type),
+  createdAtIdx: index("change_requests_created_at_idx").on(table.createdAt),
+}));
+
+export type ChangeRequest = typeof changeRequests.$inferSelect;
+export type InsertChangeRequest = typeof changeRequests.$inferInsert;
+
+/**
+ * Payment Plans table - manages payment schedules for projects
+ */
+export const paymentPlans = pgTable("paymentPlans", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  totalAmount: integer("totalAmount").notNull(), // in cents
+  currency: varchar("currency", { length: 10 }).default("USD").notNull(),
+  type: paymentPlanTypeEnum("type").notNull(),
+  status: paymentPlanStatusEnum("status").default("active").notNull(),
+  downPaymentAmount: integer("downPaymentAmount").default(0), // in cents
+  downPaymentPaid: boolean("downPaymentPaid").default(false).notNull(),
+  downPaymentPaidAt: timestamp("downPaymentPaidAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  projectIdIdx: index("payment_plans_project_id_idx").on(table.projectId),
+  statusIdx: index("payment_plans_status_idx").on(table.status),
+}));
+
+export type PaymentPlan = typeof paymentPlans.$inferSelect;
+export type InsertPaymentPlan = typeof paymentPlans.$inferInsert;
+
+/**
+ * Payment Installments table - individual payments in a payment plan
+ */
+export const paymentInstallments = pgTable("paymentInstallments", {
+  id: serial("id").primaryKey(),
+  planId: integer("planId").notNull().references(() => paymentPlans.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(), // in cents
+  dueDate: timestamp("dueDate", { mode: "date", withTimezone: true }).notNull(),
+  description: text("description"),
+  linkedMilestone: varchar("linkedMilestone", { length: 255 }), // Milestone ID from project
+  status: installmentStatusEnum("status").default("pending").notNull(),
+  paidAt: timestamp("paidAt", { mode: "date", withTimezone: true }),
+  invoiceId: integer("invoiceId").references(() => invoices.id),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  planIdIdx: index("payment_installments_plan_id_idx").on(table.planId),
+  statusIdx: index("payment_installments_status_idx").on(table.status),
+  dueDateIdx: index("payment_installments_due_date_idx").on(table.dueDate),
+  invoiceIdIdx: index("payment_installments_invoice_id_idx").on(table.invoiceId),
+}));
+
+export type PaymentInstallment = typeof paymentInstallments.$inferSelect;
+export type InsertPaymentInstallment = typeof paymentInstallments.$inferInsert;
+
+/**
+ * Project Status Changes table - tracks requests to change project status
+ */
+export const projectStatusChanges = pgTable("projectStatusChanges", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  requestedBy: integer("requestedBy").notNull().references(() => users.id),
+  fromStatus: varchar("fromStatus", { length: 50 }).notNull(),
+  toStatus: varchar("toStatus", { length: 50 }).notNull(),
+  reason: text("reason").notNull(),
+  requestType: statusChangeRequestTypeEnum("requestType").notNull(),
+  status: statusChangeRequestStatusEnum("status").default("pending").notNull(),
+  approvedBy: integer("approvedBy").references(() => users.id),
+  approvedAt: timestamp("approvedAt", { mode: "date", withTimezone: true }),
+  adminNotes: text("adminNotes"),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  projectIdIdx: index("project_status_changes_project_id_idx").on(table.projectId),
+  requestedByIdx: index("project_status_changes_requested_by_idx").on(table.requestedBy),
+  statusIdx: index("project_status_changes_status_idx").on(table.status),
+  createdAtIdx: index("project_status_changes_created_at_idx").on(table.createdAt),
+}));
+
+export type ProjectStatusChange = typeof projectStatusChanges.$inferSelect;
+export type InsertProjectStatusChange = typeof projectStatusChanges.$inferInsert;

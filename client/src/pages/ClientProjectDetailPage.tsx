@@ -13,6 +13,10 @@ import { cn } from '../lib/utils';
 import ProjectTimeline from '../components/project/ProjectTimeline';
 import ProjectInsights from '../components/project/ProjectInsights';
 import { ProjectDetailSkeleton } from '../components/ui/skeletons';
+import ProjectControlPanel from '../components/project/ProjectControlPanel';
+import ChangeRequestForm from '../components/project/ChangeRequestForm';
+import ProgressBreakdown from '../components/project/ProgressBreakdown';
+import PaymentDashboard from '../components/project/PaymentDashboard';
 
 const ClientProjectDetailPage = () => {
   const [, params] = useRoute('/client-portal/projects/:id');
@@ -204,18 +208,37 @@ const ClientProjectDetailPage = () => {
                 </CardContent>
               </Card>
 
+              {/* Project Controls */}
+              <ProjectControlPanel
+                projectId={project.id}
+                currentStatus={project.status}
+                onStatusChangeRequested={() => utils.clientPortal.getProject.invalidate({ projectId: project.id })}
+              />
+
               {/* Tabs */}
               <Tabs defaultValue="insights" className="w-full">
-                <TabsList className="bg-slate-900 border border-slate-800">
+                <TabsList className="bg-slate-900 border border-slate-800 flex-wrap">
                   <TabsTrigger value="insights" className="data-[state=active]:bg-blue-600">
                     <Zap className="h-4 w-4 mr-2" />
                     AI Insights
+                  </TabsTrigger>
+                  <TabsTrigger value="progress" className="data-[state=active]:bg-blue-600">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Progress
                   </TabsTrigger>
                   <TabsTrigger value="milestones" className="data-[state=active]:bg-blue-600">
                     Milestones
                   </TabsTrigger>
                   <TabsTrigger value="deliverables" className="data-[state=active]:bg-blue-600">
                     Deliverables
+                  </TabsTrigger>
+                  <TabsTrigger value="payments" className="data-[state=active]:bg-blue-600">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    Payments
+                  </TabsTrigger>
+                  <TabsTrigger value="changes" className="data-[state=active]:bg-blue-600">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Changes
                   </TabsTrigger>
                   <TabsTrigger value="activity" className="data-[state=active]:bg-blue-600">
                     Activity
@@ -224,6 +247,10 @@ const ClientProjectDetailPage = () => {
 
                 <TabsContent value="insights" className="mt-6">
                   <ProjectInsights project={project} />
+                </TabsContent>
+
+                <TabsContent value="progress" className="mt-6">
+                  <ProgressBreakdown projectId={project.id} />
                 </TabsContent>
 
                 <TabsContent value="milestones" className="mt-6">
@@ -414,6 +441,14 @@ const ClientProjectDetailPage = () => {
                       )}
                     </CardContent>
                   </Card>
+                </TabsContent>
+
+                <TabsContent value="payments" className="mt-6">
+                  <PaymentDashboard projectId={project.id} />
+                </TabsContent>
+
+                <TabsContent value="changes" className="mt-6">
+                  <ChangeRequestForm projectId={project.id} />
                 </TabsContent>
               </Tabs>
             </div>
