@@ -375,11 +375,11 @@ Continuous Integration and Continuous Deployment (CI/CD) are fundamental to mode
         approved: true
       },
       {
-        name: "Emma Williams",
-        role: "Product Manager",
-        company: "Property Solutions Ltd",
-        content: "The Ekhaya platform exceeded all our expectations. Herve's attention to detail and technical expertise resulted in a product that our clients absolutely love.",
-        avatar: "/images/testimonials/emma-williams.jpg",
+        name: "Papy Kapole",
+        role: "CEO",
+        company: "PRESTIGE by Ekhaya",
+        content: "Herve delivered an exceptional car wash management platform that transformed our business operations. His attention to detail and technical expertise created a system that streamlined our customer bookings, automated our membership management, and significantly improved our revenue tracking. The platform has been instrumental in scaling PRESTIGE to new heights.",
+        avatar: "/images/testimonials/papy-kapole.jpg",
         rating: 5,
         featured: true,
         approved: true
