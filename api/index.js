@@ -42,6 +42,15 @@ var messageTypeEnum = pgEnum("message_type", ["text", "file", "system"]);
 var notificationTypeEnum = pgEnum("notification_type", ["project_update", "message", "invoice", "ticket", "system"]);
 var notificationPriorityEnum = pgEnum("notification_priority", ["low", "medium", "high", "urgent"]);
 var notificationActionTypeEnum = pgEnum("notification_action_type", ["none", "view", "approve", "respond", "download", "custom"]);
+var changeRequestTypeEnum = pgEnum("change_request_type", ["scope", "timeline", "budget", "requirements", "other"]);
+var changeRequestStatusEnum = pgEnum("change_request_status", ["pending", "reviewing", "approved", "rejected", "implemented"]);
+var paymentPlanTypeEnum = pgEnum("payment_plan_type", ["milestone", "installment", "custom"]);
+var paymentPlanStatusEnum = pgEnum("payment_plan_status", ["active", "completed", "cancelled"]);
+var installmentStatusEnum = pgEnum("installment_status", ["pending", "paid", "overdue", "waived"]);
+var statusChangeRequestTypeEnum = pgEnum("status_change_request_type", ["pause", "cancel", "resume", "archive"]);
+var statusChangeRequestStatusEnum = pgEnum("status_change_request_status", ["pending", "approved", "rejected"]);
+var phaseStatusEnum = pgEnum("phase_status", ["pending", "in_progress", "completed", "skipped"]);
+var progressCalculationMethodEnum = pgEnum("progress_calculation_method", ["milestone", "phase", "deliverable", "hybrid", "manual"]);
 var users = pgTable("users", {
   /**
    * Surrogate primary key. Auto-incremented numeric value managed by the database.
@@ -312,13 +321,23 @@ var clientProjectsExtended = pgTable("clientProjectsExtended", {
   milestones: jsonb("milestones").$type().default([]),
   deliverables: jsonb("deliverables").$type().default([]),
   metadata: jsonb("metadata").$type(),
+  // Enhanced progress tracking fields
+  progressCalculationMethod: progressCalculationMethodEnum("progressCalculationMethod").default("hybrid"),
+  autoProgressTracking: boolean("autoProgressTracking").default(true).notNull(),
+  currentPhaseId: integer("currentPhaseId"),
+  // References projectPhases.id (no FK to avoid circular dependency)
+  paymentPlanId: integer("paymentPlanId"),
+  // References paymentPlans.id (no FK to avoid circular dependency)
+  lastProgressUpdate: timestamp("lastProgressUpdate", { mode: "date", withTimezone: true }),
+  lastProgressUpdateBy: integer("lastProgressUpdateBy").references(() => users.id),
   createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp("completedAt", { mode: "date", withTimezone: true })
 }, (table) => ({
   userIdIdx: index("client_projects_ext_user_id_idx").on(table.userId),
   statusIdx: index("client_projects_ext_status_idx").on(table.status),
-  createdAtIdx: index("client_projects_ext_created_at_idx").on(table.createdAt)
+  createdAtIdx: index("client_projects_ext_created_at_idx").on(table.createdAt),
+  currentPhaseIdIdx: index("client_projects_ext_current_phase_id_idx").on(table.currentPhaseId)
 }));
 var projectTypes = pgTable("projectTypes", {
   id: serial("id").primaryKey(),
@@ -488,6 +507,113 @@ var activityLog = pgTable("activityLog", {
   entityIdx: index("activity_log_entity_idx").on(table.entity),
   entityIdIdx: index("activity_log_entity_id_idx").on(table.entityId),
   createdAtIdx: index("activity_log_created_at_idx").on(table.createdAt)
+}));
+var projectPhases = pgTable("projectPhases", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  weight: integer("weight").default(0).notNull(),
+  // Percentage of total project (0-100)
+  status: phaseStatusEnum("status").default("pending").notNull(),
+  progress: integer("progress").default(0).notNull(),
+  // 0-100
+  orderIndex: integer("orderIndex").default(0).notNull(),
+  startDate: timestamp("startDate", { mode: "date", withTimezone: true }),
+  endDate: timestamp("endDate", { mode: "date", withTimezone: true }),
+  milestoneIds: jsonb("milestoneIds").$type().default([]),
+  metadata: jsonb("metadata").$type(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull()
+}, (table) => ({
+  projectIdIdx: index("project_phases_project_id_idx").on(table.projectId),
+  statusIdx: index("project_phases_status_idx").on(table.status),
+  orderIdx: index("project_phases_order_idx").on(table.orderIndex)
+}));
+var changeRequests = pgTable("changeRequests", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  requestedBy: integer("requestedBy").notNull().references(() => users.id),
+  type: changeRequestTypeEnum("type").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  currentValue: jsonb("currentValue").$type(),
+  proposedValue: jsonb("proposedValue").$type(),
+  impactAssessment: jsonb("impactAssessment").$type(),
+  status: changeRequestStatusEnum("status").default("pending").notNull(),
+  adminNotes: text("adminNotes"),
+  reviewedBy: integer("reviewedBy").references(() => users.id),
+  reviewedAt: timestamp("reviewedAt", { mode: "date", withTimezone: true }),
+  implementedAt: timestamp("implementedAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull()
+}, (table) => ({
+  projectIdIdx: index("change_requests_project_id_idx").on(table.projectId),
+  requestedByIdx: index("change_requests_requested_by_idx").on(table.requestedBy),
+  statusIdx: index("change_requests_status_idx").on(table.status),
+  typeIdx: index("change_requests_type_idx").on(table.type),
+  createdAtIdx: index("change_requests_created_at_idx").on(table.createdAt)
+}));
+var paymentPlans = pgTable("paymentPlans", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  totalAmount: integer("totalAmount").notNull(),
+  // in cents
+  currency: varchar("currency", { length: 10 }).default("USD").notNull(),
+  type: paymentPlanTypeEnum("type").notNull(),
+  status: paymentPlanStatusEnum("status").default("active").notNull(),
+  downPaymentAmount: integer("downPaymentAmount").default(0),
+  // in cents
+  downPaymentPaid: boolean("downPaymentPaid").default(false).notNull(),
+  downPaymentPaidAt: timestamp("downPaymentPaidAt", { mode: "date", withTimezone: true }),
+  metadata: jsonb("metadata").$type(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull()
+}, (table) => ({
+  projectIdIdx: index("payment_plans_project_id_idx").on(table.projectId),
+  statusIdx: index("payment_plans_status_idx").on(table.status)
+}));
+var paymentInstallments = pgTable("paymentInstallments", {
+  id: serial("id").primaryKey(),
+  planId: integer("planId").notNull().references(() => paymentPlans.id, { onDelete: "cascade" }),
+  amount: integer("amount").notNull(),
+  // in cents
+  dueDate: timestamp("dueDate", { mode: "date", withTimezone: true }).notNull(),
+  description: text("description"),
+  linkedMilestone: varchar("linkedMilestone", { length: 255 }),
+  // Milestone ID from project
+  status: installmentStatusEnum("status").default("pending").notNull(),
+  paidAt: timestamp("paidAt", { mode: "date", withTimezone: true }),
+  invoiceId: integer("invoiceId").references(() => invoices.id),
+  metadata: jsonb("metadata").$type(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow().notNull()
+}, (table) => ({
+  planIdIdx: index("payment_installments_plan_id_idx").on(table.planId),
+  statusIdx: index("payment_installments_status_idx").on(table.status),
+  dueDateIdx: index("payment_installments_due_date_idx").on(table.dueDate),
+  invoiceIdIdx: index("payment_installments_invoice_id_idx").on(table.invoiceId)
+}));
+var projectStatusChanges = pgTable("projectStatusChanges", {
+  id: serial("id").primaryKey(),
+  projectId: integer("projectId").notNull().references(() => clientProjectsExtended.id, { onDelete: "cascade" }),
+  requestedBy: integer("requestedBy").notNull().references(() => users.id),
+  fromStatus: varchar("fromStatus", { length: 50 }).notNull(),
+  toStatus: varchar("toStatus", { length: 50 }).notNull(),
+  reason: text("reason").notNull(),
+  requestType: statusChangeRequestTypeEnum("requestType").notNull(),
+  status: statusChangeRequestStatusEnum("status").default("pending").notNull(),
+  approvedBy: integer("approvedBy").references(() => users.id),
+  approvedAt: timestamp("approvedAt", { mode: "date", withTimezone: true }),
+  adminNotes: text("adminNotes"),
+  metadata: jsonb("metadata").$type(),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).defaultNow().notNull()
+}, (table) => ({
+  projectIdIdx: index("project_status_changes_project_id_idx").on(table.projectId),
+  requestedByIdx: index("project_status_changes_requested_by_idx").on(table.requestedBy),
+  statusIdx: index("project_status_changes_status_idx").on(table.status),
+  createdAtIdx: index("project_status_changes_created_at_idx").on(table.createdAt)
 }));
 
 // server/_core/env.ts
@@ -2240,6 +2366,549 @@ var clientPortalRouter = router({
     if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
     const activities = await db.select().from(activityLog).where(eq5(activityLog.userId, ctx.user.id)).orderBy(desc3(activityLog.createdAt)).limit(input.limit).offset(input.offset);
     return activities;
+  }),
+  /**
+   * ========================================
+   * PROJECT PHASES
+   * ========================================
+   */
+  // Get project phases
+  getProjectPhases: protectedProcedure.input(z6.object({ projectId: z6.number() })).query(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const project = await db.select().from(clientProjectsExtended).where(
+      and3(
+        eq5(clientProjectsExtended.id, input.projectId),
+        eq5(clientProjectsExtended.userId, ctx.user.id)
+      )
+    ).limit(1);
+    if (!project.length) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    const phases = await db.select().from(projectPhases).where(eq5(projectPhases.projectId, input.projectId)).orderBy(asc2(projectPhases.orderIndex));
+    return phases;
+  }),
+  // Create project phase (admin only - would need admin check)
+  createProjectPhase: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      name: z6.string().min(1),
+      description: z6.string().optional(),
+      weight: z6.number().min(0).max(100),
+      orderIndex: z6.number().default(0),
+      startDate: z6.date().optional(),
+      endDate: z6.date().optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [phase] = await db.insert(projectPhases).values({
+      projectId: input.projectId,
+      name: input.name,
+      description: input.description || null,
+      weight: input.weight,
+      orderIndex: input.orderIndex,
+      startDate: input.startDate || null,
+      endDate: input.endDate || null,
+      status: "pending",
+      progress: 0
+    }).returning();
+    await db.insert(activityLog).values({
+      userId: ctx.user.id,
+      action: "create_phase",
+      entity: "project_phase",
+      entityId: phase.id,
+      description: `Created phase "${input.name}" for project`
+    });
+    return phase;
+  }),
+  // Update phase progress
+  updatePhaseProgress: protectedProcedure.input(
+    z6.object({
+      phaseId: z6.number(),
+      progress: z6.number().min(0).max(100),
+      status: z6.enum(["pending", "in_progress", "completed", "skipped"]).optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const updateData = { progress: input.progress, updatedAt: /* @__PURE__ */ new Date() };
+    if (input.status) {
+      updateData.status = input.status;
+    }
+    const [phase] = await db.update(projectPhases).set(updateData).where(eq5(projectPhases.id, input.phaseId)).returning();
+    if (phase) {
+      const [project] = await db.select().from(clientProjectsExtended).where(eq5(clientProjectsExtended.id, phase.projectId)).limit(1);
+      if (project?.autoProgressTracking) {
+        const allPhases = await db.select().from(projectPhases).where(eq5(projectPhases.projectId, phase.projectId));
+        const totalWeight = allPhases.reduce((sum, p) => sum + (p.weight || 0), 0);
+        const weightedProgress = allPhases.reduce(
+          (sum, p) => sum + (p.progress || 0) * (p.weight || 0) / 100,
+          0
+        );
+        const overallProgress = totalWeight > 0 ? Math.round(weightedProgress / totalWeight * 100) : 0;
+        await db.update(clientProjectsExtended).set({
+          progress: overallProgress,
+          lastProgressUpdate: /* @__PURE__ */ new Date(),
+          lastProgressUpdateBy: ctx.user.id
+        }).where(eq5(clientProjectsExtended.id, phase.projectId));
+      }
+    }
+    return phase;
+  }),
+  /**
+   * ========================================
+   * CHANGE REQUESTS
+   * ========================================
+   */
+  // Get change requests for a project
+  getChangeRequests: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      status: z6.enum(["pending", "reviewing", "approved", "rejected", "implemented"]).optional()
+    })
+  ).query(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const conditions = [eq5(changeRequests.projectId, input.projectId)];
+    if (input.status) {
+      conditions.push(eq5(changeRequests.status, input.status));
+    }
+    const requests = await db.select().from(changeRequests).where(and3(...conditions)).orderBy(desc3(changeRequests.createdAt));
+    return requests;
+  }),
+  // Create change request
+  createChangeRequest: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      type: z6.enum(["scope", "timeline", "budget", "requirements", "other"]),
+      title: z6.string().min(1),
+      description: z6.string().min(10),
+      currentValue: z6.any().optional(),
+      proposedValue: z6.any().optional(),
+      impactAssessment: z6.object({
+        timelineImpact: z6.string().optional(),
+        budgetImpact: z6.number().optional(),
+        scopeImpact: z6.string().optional(),
+        riskLevel: z6.enum(["low", "medium", "high"]).optional()
+      }).optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const project = await db.select().from(clientProjectsExtended).where(
+      and3(
+        eq5(clientProjectsExtended.id, input.projectId),
+        eq5(clientProjectsExtended.userId, ctx.user.id)
+      )
+    ).limit(1);
+    if (!project.length) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    const [request] = await db.insert(changeRequests).values({
+      projectId: input.projectId,
+      requestedBy: ctx.user.id,
+      type: input.type,
+      title: input.title,
+      description: input.description,
+      currentValue: input.currentValue || null,
+      proposedValue: input.proposedValue || null,
+      impactAssessment: input.impactAssessment || null,
+      status: "pending"
+    }).returning();
+    await db.insert(notifications).values({
+      userId: ctx.user.id,
+      // In real app, send to admin
+      type: "project_update",
+      priority: "medium",
+      title: "New Change Request",
+      message: `${ctx.user.name} submitted a change request for ${project[0].title}`,
+      link: `/client-portal/projects/${input.projectId}`,
+      actionType: "approve",
+      actionUrl: `/admin/change-requests/${request.id}`,
+      actionLabel: "Review Request"
+    });
+    await db.insert(activityLog).values({
+      userId: ctx.user.id,
+      action: "create_change_request",
+      entity: "change_request",
+      entityId: request.id,
+      description: `Submitted change request: ${input.title}`
+    });
+    return request;
+  }),
+  // Review change request (admin only)
+  reviewChangeRequest: protectedProcedure.input(
+    z6.object({
+      requestId: z6.number(),
+      status: z6.enum(["approved", "rejected"]),
+      adminNotes: z6.string().optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [request] = await db.update(changeRequests).set({
+      status: input.status,
+      adminNotes: input.adminNotes || null,
+      reviewedBy: ctx.user.id,
+      reviewedAt: /* @__PURE__ */ new Date(),
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq5(changeRequests.id, input.requestId)).returning();
+    if (request) {
+      await db.insert(notifications).values({
+        userId: request.requestedBy,
+        type: "project_update",
+        priority: "high",
+        title: `Change Request ${input.status === "approved" ? "Approved" : "Rejected"}`,
+        message: `Your change request "${request.title}" has been ${input.status}`,
+        link: `/client-portal/projects/${request.projectId}`
+      });
+    }
+    return request;
+  }),
+  /**
+   * ========================================
+   * PROJECT STATUS CHANGES
+   * ========================================
+   */
+  // Request project status change
+  requestStatusChange: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      requestType: z6.enum(["pause", "cancel", "resume", "archive"]),
+      reason: z6.string().min(10)
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [project] = await db.select().from(clientProjectsExtended).where(
+      and3(
+        eq5(clientProjectsExtended.id, input.projectId),
+        eq5(clientProjectsExtended.userId, ctx.user.id)
+      )
+    ).limit(1);
+    if (!project) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    let toStatus = project.status;
+    if (input.requestType === "pause") toStatus = "on_hold";
+    if (input.requestType === "cancel") toStatus = "archived";
+    if (input.requestType === "resume") toStatus = "in_progress";
+    if (input.requestType === "archive") toStatus = "archived";
+    const [statusChange] = await db.insert(projectStatusChanges).values({
+      projectId: input.projectId,
+      requestedBy: ctx.user.id,
+      fromStatus: project.status,
+      toStatus,
+      reason: input.reason,
+      requestType: input.requestType,
+      status: "pending"
+    }).returning();
+    await db.insert(notifications).values({
+      userId: ctx.user.id,
+      // In real app, send to admin
+      type: "project_update",
+      priority: input.requestType === "cancel" ? "urgent" : "high",
+      title: `Project ${input.requestType.charAt(0).toUpperCase() + input.requestType.slice(1)} Request`,
+      message: `${ctx.user.name} requested to ${input.requestType} project "${project.title}"`,
+      link: `/client-portal/projects/${input.projectId}`,
+      actionType: "approve",
+      actionUrl: `/admin/status-changes/${statusChange.id}`,
+      actionLabel: "Review Request"
+    });
+    return statusChange;
+  }),
+  // Get status change requests
+  getStatusChangeRequests: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      status: z6.enum(["pending", "approved", "rejected"]).optional()
+    })
+  ).query(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const conditions = [eq5(projectStatusChanges.projectId, input.projectId)];
+    if (input.status) {
+      conditions.push(eq5(projectStatusChanges.status, input.status));
+    }
+    const requests = await db.select().from(projectStatusChanges).where(and3(...conditions)).orderBy(desc3(projectStatusChanges.createdAt));
+    return requests;
+  }),
+  // Approve/reject status change (admin only)
+  approveStatusChange: protectedProcedure.input(
+    z6.object({
+      requestId: z6.number(),
+      approved: z6.boolean(),
+      adminNotes: z6.string().optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [request] = await db.update(projectStatusChanges).set({
+      status: input.approved ? "approved" : "rejected",
+      approvedBy: ctx.user.id,
+      approvedAt: /* @__PURE__ */ new Date(),
+      adminNotes: input.adminNotes || null
+    }).where(eq5(projectStatusChanges.id, input.requestId)).returning();
+    if (request && input.approved) {
+      await db.update(clientProjectsExtended).set({ status: request.toStatus }).where(eq5(clientProjectsExtended.id, request.projectId));
+    }
+    if (request) {
+      await db.insert(notifications).values({
+        userId: request.requestedBy,
+        type: "project_update",
+        priority: "high",
+        title: `Status Change ${input.approved ? "Approved" : "Rejected"}`,
+        message: `Your request to ${request.requestType} the project has been ${input.approved ? "approved" : "rejected"}`,
+        link: `/client-portal/projects/${request.projectId}`
+      });
+    }
+    return request;
+  }),
+  /**
+   * ========================================
+   * PAYMENT MANAGEMENT
+   * ========================================
+   */
+  // Get payment plan for project
+  getPaymentPlan: protectedProcedure.input(z6.object({ projectId: z6.number() })).query(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const project = await db.select().from(clientProjectsExtended).where(
+      and3(
+        eq5(clientProjectsExtended.id, input.projectId),
+        eq5(clientProjectsExtended.userId, ctx.user.id)
+      )
+    ).limit(1);
+    if (!project.length) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    const [plan] = await db.select().from(paymentPlans).where(eq5(paymentPlans.projectId, input.projectId)).limit(1);
+    if (!plan) {
+      return null;
+    }
+    const installments = await db.select().from(paymentInstallments).where(eq5(paymentInstallments.planId, plan.id)).orderBy(asc2(paymentInstallments.dueDate));
+    return { ...plan, installments };
+  }),
+  // Create payment plan (admin only)
+  createPaymentPlan: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      totalAmount: z6.number().min(0),
+      currency: z6.string().default("USD"),
+      type: z6.enum(["milestone", "installment", "custom"]),
+      downPaymentAmount: z6.number().min(0).optional(),
+      installments: z6.array(
+        z6.object({
+          amount: z6.number().min(0),
+          dueDate: z6.date(),
+          description: z6.string(),
+          linkedMilestone: z6.string().optional()
+        })
+      )
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [plan] = await db.insert(paymentPlans).values({
+      projectId: input.projectId,
+      totalAmount: input.totalAmount,
+      currency: input.currency,
+      type: input.type,
+      downPaymentAmount: input.downPaymentAmount || 0,
+      status: "active"
+    }).returning();
+    if (input.installments.length > 0) {
+      await db.insert(paymentInstallments).values(
+        input.installments.map((inst) => ({
+          planId: plan.id,
+          amount: inst.amount,
+          dueDate: inst.dueDate,
+          description: inst.description,
+          linkedMilestone: inst.linkedMilestone || null,
+          status: "pending"
+        }))
+      );
+    }
+    await db.update(clientProjectsExtended).set({ paymentPlanId: plan.id }).where(eq5(clientProjectsExtended.id, input.projectId));
+    return plan;
+  }),
+  // Record payment for installment
+  recordPayment: protectedProcedure.input(
+    z6.object({
+      installmentId: z6.number(),
+      invoiceId: z6.number().optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [installment] = await db.update(paymentInstallments).set({
+      status: "paid",
+      paidAt: /* @__PURE__ */ new Date(),
+      invoiceId: input.invoiceId || null,
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq5(paymentInstallments.id, input.installmentId)).returning();
+    if (installment) {
+      const allInstallments = await db.select().from(paymentInstallments).where(eq5(paymentInstallments.planId, installment.planId));
+      const allPaid = allInstallments.every((inst) => inst.status === "paid" || inst.status === "waived");
+      if (allPaid) {
+        await db.update(paymentPlans).set({ status: "completed", updatedAt: /* @__PURE__ */ new Date() }).where(eq5(paymentPlans.id, installment.planId));
+      }
+      const [plan] = await db.select().from(paymentPlans).where(eq5(paymentPlans.id, installment.planId)).limit(1);
+      if (plan) {
+        await db.insert(notifications).values({
+          userId: ctx.user.id,
+          type: "invoice",
+          priority: "medium",
+          title: "Payment Received",
+          message: `Payment of $${(installment.amount / 100).toFixed(2)} has been recorded`,
+          link: `/client-portal/projects/${plan.projectId}`
+        });
+      }
+    }
+    return installment;
+  }),
+  /**
+   * ========================================
+   * PROGRESS TRACKING
+   * ========================================
+   */
+  // Manually update project progress (admin only)
+  updateProjectProgress: protectedProcedure.input(
+    z6.object({
+      projectId: z6.number(),
+      progress: z6.number().min(0).max(100),
+      reason: z6.string().optional()
+    })
+  ).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [project] = await db.update(clientProjectsExtended).set({
+      progress: input.progress,
+      lastProgressUpdate: /* @__PURE__ */ new Date(),
+      lastProgressUpdateBy: ctx.user.id,
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq5(clientProjectsExtended.id, input.projectId)).returning();
+    await db.insert(activityLog).values({
+      userId: ctx.user.id,
+      action: "update_progress",
+      entity: "project",
+      entityId: input.projectId,
+      description: `Updated project progress to ${input.progress}%${input.reason ? `: ${input.reason}` : ""}`
+    });
+    return project;
+  }),
+  // Recalculate project progress based on milestones/phases
+  recalculateProgress: protectedProcedure.input(z6.object({ projectId: z6.number() })).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [project] = await db.select().from(clientProjectsExtended).where(eq5(clientProjectsExtended.id, input.projectId)).limit(1);
+    if (!project) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    let calculatedProgress = 0;
+    if (project.progressCalculationMethod === "milestone") {
+      const milestones = project.milestones || [];
+      if (milestones.length > 0) {
+        const completed = milestones.filter((m) => m.completed).length;
+        calculatedProgress = Math.round(completed / milestones.length * 100);
+      }
+    } else if (project.progressCalculationMethod === "phase") {
+      const phases = await db.select().from(projectPhases).where(eq5(projectPhases.projectId, input.projectId));
+      if (phases.length > 0) {
+        const totalWeight = phases.reduce((sum, p) => sum + (p.weight || 0), 0);
+        const weightedProgress = phases.reduce(
+          (sum, p) => sum + (p.progress || 0) * (p.weight || 0) / 100,
+          0
+        );
+        calculatedProgress = totalWeight > 0 ? Math.round(weightedProgress / totalWeight * 100) : 0;
+      }
+    } else if (project.progressCalculationMethod === "deliverable") {
+      const deliverables = project.deliverables || [];
+      if (deliverables.length > 0) {
+        const completed = deliverables.filter((d) => d.completed).length;
+        calculatedProgress = Math.round(completed / deliverables.length * 100);
+      }
+    } else if (project.progressCalculationMethod === "hybrid") {
+      const milestones = project.milestones || [];
+      const deliverables = project.deliverables || [];
+      const phases = await db.select().from(projectPhases).where(eq5(projectPhases.projectId, input.projectId));
+      let milestoneProgress = 0;
+      if (milestones.length > 0) {
+        const completed = milestones.filter((m) => m.completed).length;
+        milestoneProgress = completed / milestones.length * 100;
+      }
+      let phaseProgress = 0;
+      if (phases.length > 0) {
+        const totalWeight = phases.reduce((sum, p) => sum + (p.weight || 0), 0);
+        const weightedProgress = phases.reduce(
+          (sum, p) => sum + (p.progress || 0) * (p.weight || 0) / 100,
+          0
+        );
+        phaseProgress = totalWeight > 0 ? weightedProgress / totalWeight * 100 : 0;
+      }
+      let deliverableProgress = 0;
+      if (deliverables.length > 0) {
+        const completed = deliverables.filter((d) => d.completed).length;
+        deliverableProgress = completed / deliverables.length * 100;
+      }
+      calculatedProgress = Math.round(milestoneProgress * 0.4 + phaseProgress * 0.4 + deliverableProgress * 0.2);
+    }
+    const [updatedProject] = await db.update(clientProjectsExtended).set({
+      progress: calculatedProgress,
+      lastProgressUpdate: /* @__PURE__ */ new Date(),
+      lastProgressUpdateBy: ctx.user.id,
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq5(clientProjectsExtended.id, input.projectId)).returning();
+    return updatedProject;
+  }),
+  // Get progress breakdown
+  getProgressBreakdown: protectedProcedure.input(z6.object({ projectId: z6.number() })).query(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError3({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+    const [project] = await db.select().from(clientProjectsExtended).where(
+      and3(
+        eq5(clientProjectsExtended.id, input.projectId),
+        eq5(clientProjectsExtended.userId, ctx.user.id)
+      )
+    ).limit(1);
+    if (!project) {
+      throw new TRPCError3({ code: "NOT_FOUND", message: "Project not found" });
+    }
+    const phases = await db.select().from(projectPhases).where(eq5(projectPhases.projectId, input.projectId)).orderBy(asc2(projectPhases.orderIndex));
+    const milestones = project.milestones || [];
+    const deliverables = project.deliverables || [];
+    const milestoneProgress = milestones.length > 0 ? Math.round(milestones.filter((m) => m.completed).length / milestones.length * 100) : 0;
+    const deliverableProgress = deliverables.length > 0 ? Math.round(deliverables.filter((d) => d.completed).length / deliverables.length * 100) : 0;
+    const totalPhaseWeight = phases.reduce((sum, p) => sum + (p.weight || 0), 0);
+    const phaseProgress = totalPhaseWeight > 0 ? Math.round(
+      phases.reduce((sum, p) => sum + (p.progress || 0) * (p.weight || 0) / 100, 0) / totalPhaseWeight * 100
+    ) : 0;
+    return {
+      overall: project.progress,
+      milestones: {
+        progress: milestoneProgress,
+        completed: milestones.filter((m) => m.completed).length,
+        total: milestones.length
+      },
+      deliverables: {
+        progress: deliverableProgress,
+        completed: deliverables.filter((d) => d.completed).length,
+        total: deliverables.length
+      },
+      phases: {
+        progress: phaseProgress,
+        items: phases.map((p) => ({
+          id: p.id,
+          name: p.name,
+          progress: p.progress,
+          weight: p.weight,
+          status: p.status
+        }))
+      },
+      calculationMethod: project.progressCalculationMethod,
+      lastUpdate: project.lastProgressUpdate
+    };
   })
 });
 
@@ -2272,8 +2941,14 @@ var magicLinkRouter = router({
       ip,
       userAgent
     });
-    const origin = ctx.req?.headers?.origin || ctx.req?.headers?.referer?.replace(/\/$/, "") || "http://localhost:3000";
+    const origin = ctx.req?.headers?.origin || ctx.req?.headers?.referer?.replace(/\/$/, "") || process.env.APP_URL || "https://hopstecinnovation.com";
     const magicLinkUrl = `${origin}/auth/verify?token=${token}`;
+    console.log("[MagicLink] Generated magic link:", {
+      origin,
+      hasOriginHeader: !!ctx.req?.headers?.origin,
+      hasRefererHeader: !!ctx.req?.headers?.referer,
+      usedAppUrl: !ctx.req?.headers?.origin && !ctx.req?.headers?.referer
+    });
     try {
       await sendMagicLinkEmail({
         to: email,

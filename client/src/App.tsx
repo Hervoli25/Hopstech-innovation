@@ -18,6 +18,7 @@ import SupportPage from "./pages/SupportPage";
 import ProfilePage from "./pages/ProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import { ScrollProgress } from "./components/animations/ScrollProgress";
+import { Analytics } from "@vercel/analytics/react";
 
 function Router() {
   return (
@@ -53,6 +54,7 @@ function App() {
           <ScrollProgress />
           <Toaster />
           <Router />
+          <Analytics />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
