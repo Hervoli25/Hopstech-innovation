@@ -10,88 +10,81 @@ async function seed() {
   }
 
   try {
+    // Clear existing data first
+    console.log("🗑️  Clearing existing data...");
+    await db.delete(projectTypes);
+    await db.delete(testimonials);
+    await db.delete(blogPosts);
+    await db.delete(services);
+    await db.delete(projects);
+    console.log("✅ Existing data cleared");
+
     // Seed Projects
     console.log("📦 Seeding projects...");
     await db.insert(projects).values([
       {
-        title: "Talaria - Fleet Management System",
-        slug: "talaria-fleet-management",
-        description: "Advanced fleet management and logistics optimization platform",
-        longDescription: `Talaria is a comprehensive fleet management system designed to optimize logistics operations, reduce costs, and improve delivery efficiency. The platform provides real-time tracking, route optimization, and predictive maintenance capabilities.
-        
-        **Challenge:** The client was facing significant operational inefficiencies with their traditional fleet management approach, leading to high fuel costs and delayed deliveries.
-        
-        **Solution:** We developed a cloud-native platform using microservices architecture, implementing real-time GPS tracking, AI-powered route optimization, and predictive maintenance algorithms.
-        
-        **Results:** The implementation resulted in a 65% improvement in delivery efficiency, 40% reduction in operational costs, and 99.9% system uptime.`,
-        thumbnail: "/images/projects/talaria-thumbnail.jpg",
+        title: "Talaria Dashboard",
+        slug: "talaria-dashboard",
+        description: "Integrated operations management platform for semiconductor manufacturing logistics",
+        longDescription: `Talaria Dashboard is an integrated operations management platform specifically designed to address the unique challenges of semiconductor manufacturing logistics. This custom solution streamlines critical workflows by centralizing inventory tracking, shipment management, and location monitoring in a single, secure interface.
+
+**Overview**
+
+Talaria Dashboard represents one of my proudest accomplishments - a specialized logistics platform built from the ground up to meet the exacting demands of semiconductor manufacturing operations. The platform provides real-time visibility into complex supply chain operations while maintaining the security and precision required in this critical industry.
+
+**Challenge**
+
+Semiconductor manufacturing logistics presents unique challenges that generic fleet management systems cannot address. The client needed a solution that could handle:
+- High-value inventory tracking with precision accuracy
+- Complex shipment coordination across multiple facilities
+- Real-time location monitoring for time-sensitive materials
+- Secure access controls for sensitive manufacturing data
+- Integration with existing manufacturing execution systems
+
+**Solution**
+
+We developed a custom operations management platform featuring:
+• Centralized inventory tracking with real-time updates and alerts
+• Advanced shipment management with automated status notifications
+• Location monitoring dashboard with geofencing capabilities
+• Role-based access control for secure data management
+• Custom reporting and analytics for operational insights
+• Integration APIs for seamless connection with manufacturing systems
+• Mobile-responsive interface for on-the-go access
+• Automated workflow triggers for critical events
+
+**Results**
+
+The Talaria Dashboard has transformed semiconductor manufacturing logistics operations, delivering measurable improvements in efficiency, accuracy, and visibility. The centralized platform eliminated data silos, reduced manual tracking errors, and provided unprecedented operational transparency.`,
+        thumbnail: "/showcase/Talaria1.png",
         images: [
-          "/images/projects/talaria-1.jpg",
-          "/images/projects/talaria-2.jpg",
-          "/images/projects/talaria-3.jpg"
+          "/showcase/Talaria1.png",
+          "/showcase/Talaria2.png",
+          "/showcase/Talaria3.png"
         ] as any,
         technologies: [
           "React",
+          "TypeScript",
           "Node.js",
+          "Express",
           "PostgreSQL",
           "Docker",
-          "Kubernetes",
           "AWS",
           "Redis",
-          "GraphQL"
+          "REST API",
+          "Material-UI"
         ] as any,
         category: "Full-Stack Development",
-        client: "Logistics Corp",
-        url: "https://talaria-demo.example.com",
-        githubUrl: "https://github.com/hopstech/talaria",
+        client: "Semiconductor Manufacturing",
         featured: true,
         order: 1,
         metrics: {
-          "Performance Improvement": "65%",
-          "Cost Reduction": "40%",
-          "System Uptime": "99.9%",
-          "User Satisfaction": "4.8/5"
+          "Tracking Accuracy": "99.8%",
+          "Process Efficiency": "+55%",
+          "Error Reduction": "78%",
+          "User Satisfaction": "4.9/5"
         } as any,
         publishedAt: new Date("2024-01-15")
-      },
-      {
-        title: "Talos - CI/CD Pipeline Automation",
-        slug: "talos-cicd-automation",
-        description: "Enterprise-grade CI/CD pipeline automation and DevOps orchestration platform",
-        longDescription: `Talos is an enterprise CI/CD platform that automates the entire software delivery lifecycle, from code commit to production deployment. It integrates seamlessly with existing tools and provides comprehensive monitoring and rollback capabilities.
-        
-        **Challenge:** The organization was struggling with manual deployment processes, leading to frequent errors and slow release cycles.
-        
-        **Solution:** We built an automated CI/CD platform with multi-cloud support, automated testing, security scanning, and one-click rollback functionality.
-        
-        **Results:** Deployment time reduced from hours to minutes, with zero-downtime deployments and 50% reduction in production incidents.`,
-        thumbnail: "/images/projects/talos-thumbnail.jpg",
-        images: [
-          "/images/projects/talos-1.jpg",
-          "/images/projects/talos-2.jpg"
-        ] as any,
-        technologies: [
-          "Jenkins",
-          "Docker",
-          "Kubernetes",
-          "Terraform",
-          "Ansible",
-          "Python",
-          "GitLab",
-          "Prometheus"
-        ] as any,
-        category: "DevOps",
-        client: "Tech Enterprise Inc",
-        url: "https://talos-demo.example.com",
-        featured: true,
-        order: 2,
-        metrics: {
-          "Deployment Speed": "10x faster",
-          "Incident Reduction": "50%",
-          "Automation Rate": "95%",
-          "Developer Satisfaction": "4.9/5"
-        } as any,
-        publishedAt: new Date("2024-03-20")
       },
       {
         title: "PRESTIGE Car Wash",
@@ -356,20 +349,10 @@ Continuous Integration and Continuous Deployment (CI/CD) are fundamental to mode
     await db.insert(testimonials).values([
       {
         name: "Sarah Johnson",
-        role: "CTO",
-        company: "Logistics Corp",
-        content: "Herve transformed our entire infrastructure. The Talaria platform has revolutionized our fleet management operations. His expertise in DevOps and cloud architecture is unmatched.",
+        role: "Operations Director",
+        company: "Semiconductor Manufacturing",
+        content: "Herve delivered an exceptional operations management platform that transformed our semiconductor manufacturing logistics. The Talaria Dashboard centralized our inventory tracking, shipment management, and location monitoring in ways we never thought possible. His deep understanding of our unique logistics challenges and technical expertise resulted in a mission-critical system for our operations.",
         avatar: "/images/testimonials/sarah-johnson.jpg",
-        rating: 5,
-        featured: true,
-        approved: true
-      },
-      {
-        name: "Michael Chen",
-        role: "VP of Engineering",
-        company: "Tech Enterprise Inc",
-        content: "Working with Herve on our CI/CD pipeline was a game-changer. The Talos platform reduced our deployment time by 90% and significantly improved our development workflow.",
-        avatar: "/images/testimonials/michael-chen.jpg",
         rating: 5,
         featured: true,
         approved: true
