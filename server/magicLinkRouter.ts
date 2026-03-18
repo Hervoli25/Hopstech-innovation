@@ -4,7 +4,7 @@ import { getDb, createMagicLink, getMagicLinkByToken, markMagicLinkAsUsed, getUs
 import { nanoid } from "nanoid";
 import { sendMagicLinkEmail } from "./emailService";
 import { sdk } from "./_core/sdk";
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 
 const MAGIC_LINK_EXPIRY_MINUTES = 15;
