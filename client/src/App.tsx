@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ContactPage from "./pages/ContactPage";
+import AquaPulsePage from "./pages/AquaPulsePage";
 import ClientPortalPage from "./pages/ClientPortalPage";
 import AuthVerifyPage from "./pages/AuthVerifyPage";
 import ProjectsPage from "./pages/ProjectsPage";
@@ -23,6 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={HomePage} />
+      <Route path={"/aquapulse"} component={AquaPulsePage} />
       <Route path={"/portfolio"} component={PortfolioPage} />
       <Route path={"/portfolio/:slug"} component={ProjectDetailPage} />
       <Route path={"/contact"} component={ContactPage} />

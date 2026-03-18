@@ -19,6 +19,7 @@ const Navigation = () => {
 
   const navLinks = [
     { href: '/', label: 'Home' },
+    { href: '/aquapulse', label: 'AquaPulse' },
     { href: '/portfolio', label: 'Portfolio' },
     { href: '/contact', label: 'Contact' },
   ];

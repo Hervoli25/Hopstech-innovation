@@ -40,12 +40,21 @@ const HomePage = () => {
               One Line at a Time
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Hi, I'm <span className="text-blue-400 font-semibold">Herve Kajingu</span>. 
+            <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-2xl mx-auto">
+              Hi, I'm <span className="text-blue-400 font-semibold">Herve Kajingu</span>.
               I transform ideas into scalable, high-performance solutions with cutting-edge DevOps practices and modern web technologies.
+            </p>
+            <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+              🚀 <span className="text-cyan-400 font-medium">New:</span> Introducing <span className="text-cyan-400 font-semibold">AquaPulse SmartWater</span> — my smart water control invention that detects leaks and protects homes.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/aquapulse">
+                <Button size="lg" className="bg-cyan-500 hover:bg-cyan-600 text-slate-950">
+                  Explore AquaPulse
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
               <Link href="/client-portal">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
                   Let's Build Together

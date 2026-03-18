@@ -87,6 +87,202 @@ The Talaria Dashboard has transformed semiconductor manufacturing logistics oper
         publishedAt: new Date("2024-01-15")
       },
       {
+        title: "AquaPulse SmartWater",
+        slug: "aquapulse-smartwater",
+        description: "Smart water control system that detects leaks in real time and automatically shuts off your water",
+        longDescription: `AquaPulse is a smart water control system that detects leaks in real time and automatically shuts off your water. Protect your home. Save money. Gain peace of mind.
+
+**The Problem**
+
+Water damage is one of the most expensive and underestimated risks in homes. Leaks often go unnoticed for hours or days — causing thousands in damage. At the same time, water waste continues silently, increasing your bills.
+
+**The Solution**
+
+AquaPulse gives you full control over your water usage. It monitors your water flow in real time, detects abnormal behavior, and reacts instantly. In case of a leak, AquaPulse can automatically shut off your water — before damage happens.
+
+**How It Works**
+
+1. Install AquaPulse on your water system
+2. Connect to the web dashboard
+3. Monitor, receive alerts, and control your water anytime
+
+Simple. Intelligent. Autonomous.
+
+**Key Features**
+
+• Real-time water monitoring
+• Intelligent leak detection
+• Automatic water shutoff
+• Cloud dashboard access
+• Remote control from anywhere
+• Optimized for energy and efficiency
+
+**The Story**
+
+AquaPulse was inspired by real-world water scarcity. During a severe drought in Cape Town, strict water restrictions revealed how inefficient and unmanaged water usage can be. This experience led to the creation of AquaPulse — a smarter way to manage water at home.`,
+        thumbnail: "/showcase/AquaDashboard.png",
+        images: [
+          "/showcase/AquaDashboard.png",
+          "/showcase/Aquaalert.png",
+          "/showcase/AquaAlertRules.png",
+          "/showcase/AquaAnalytics.png",
+          "/showcase/AquaAuth.png",
+          "/showcase/AquaDevices.png",
+          "/showcase/Aqualogs.png",
+          "/showcase/AquaMenu.png",
+          "/showcase/AquaOnboarding.png"
+        ] as any,
+        technologies: [
+          "ESP32",
+          "MQTT",
+          "HiveMQ",
+          "Django",
+          "PostgreSQL",
+          "Railway",
+          "Expo",
+          "React Native",
+          "IoT"
+        ] as any,
+        category: "Hardware & IoT",
+        client: "Personal Invention",
+        featured: true,
+        order: 0,
+        metrics: {
+          "Device Price": "€129",
+          "Subscription": "€3/month",
+          "Status": "Patent Pending",
+          "Origin": "Designed in France"
+        } as any,
+        publishedAt: new Date("2025-01-01")
+      },
+      {
+        title: "NutriTrack",
+        slug: "nutritrack",
+        description: "Fuel your body, master your health. Track nutrition with precision and reach your health goals faster.",
+        longDescription: `NutriTrack helps you fuel your body and master your health. Track your nutrition with precision, get personalized insights, beautiful analytics, and reach your health goals faster than ever.
+
+**Smart Food Logging**
+
+Log meals in seconds with our extensive database of 10,000+ verified foods. Barcode scanning makes it even faster.
+
+**Beautiful Analytics**
+
+Visualize your progress with stunning charts and insights. Track macros, calories, and trends over time.
+
+**Personalized Goals**
+
+Set custom nutrition targets based on your unique needs. Whether you're losing, maintaining, or gaining - we've got you covered.
+
+**Key Features**
+
+• Extensive food database with 10,000+ verified foods
+• Barcode scanning for quick logging
+• Macro and calorie tracking
+• Beautiful progress charts and analytics
+• Personalized nutrition goals
+• Trend analysis over time
+• Daily, weekly, and monthly insights`,
+        thumbnail: "/showcase/NutriTrack1.png",
+        images: [
+          "/showcase/NutriTrack1.png",
+          "/showcase/NutriTrack2.png",
+          "/showcase/NutriTrack3.png",
+          "/showcase/NutriTrack4.png",
+          "/showcase/NutriTrack5.png",
+          "/showcase/NutriTrack6.png",
+          "/showcase/NutriTrack7.png",
+          "/showcase/NutriTrack8.png",
+          "/showcase/NutriTrack9.png",
+          "/showcase/NutriTrack10.png",
+          "/showcase/NutriTrack11.png"
+        ] as any,
+        technologies: [
+          "React Native",
+          "Expo",
+          "TypeScript",
+          "Node.js",
+          "PostgreSQL",
+          "REST API",
+          "Analytics"
+        ] as any,
+        category: "Mobile Development",
+        client: "Personal Project",
+        featured: true,
+        order: 1,
+        metrics: {
+          "Food Database": "10,000+",
+          "Barcode Scanning": "Yes",
+          "Analytics": "Real-time",
+          "Goal Tracking": "Personalized"
+        } as any,
+        publishedAt: new Date("2025-03-01")
+      },
+      {
+        title: "HopsVoir",
+        slug: "hopsvoir",
+        description: "Global license plate recognition system for carwash operations with real-time vehicle tracking",
+        longDescription: `HopsVoir streamlines your carwash operations with global license plate recognition. Track vehicles, manage workflows, and gain real-time insights.
+
+**Overview**
+
+HopsVoir is an intelligent carwash management system that uses advanced license plate recognition technology to automate and optimize every aspect of your carwash operations. From the moment a vehicle arrives to the completion of service, HopsVoir tracks and manages the entire workflow.
+
+**Key Features**
+
+• **Global License Plate Recognition** - Automatically identify vehicles from any country
+• **Vehicle Tracking** - Track each vehicle through every wash stage from receipt to completion
+• **Workflow Management** - Streamline operations with automated stage transitions
+• **Real-time Insights** - Monitor your business performance with live dashboards
+• **Customer History** - Instant access to vehicle service history and preferences
+• **Queue Management** - Optimize wait times and service scheduling
+
+**How It Works**
+
+1. Vehicle arrives and license plate is automatically scanned
+2. System retrieves customer history and preferences
+3. Track progress through each wash stage in real-time
+4. Complete service with automated logging and analytics
+
+**Benefits**
+
+- Reduce manual data entry and human error
+- Speed up customer check-in process
+- Improve operational visibility
+- Enhance customer experience with personalized service
+- Generate actionable business insights`,
+        thumbnail: "/showcase/NP1.png",
+        images: [
+          "/showcase/NP1.png",
+          "/showcase/NP2.png",
+          "/showcase/NP3.png",
+          "/showcase/NP4.png",
+          "/showcase/NP5.png",
+          "/showcase/NP7.png",
+          "/showcase/NP8.png"
+        ] as any,
+        technologies: [
+          "React",
+          "TypeScript",
+          "Node.js",
+          "License Plate Recognition",
+          "Computer Vision",
+          "PostgreSQL",
+          "Real-time Analytics",
+          "Cloud Infrastructure"
+        ] as any,
+        category: "Full-Stack Development",
+        client: "HOPSTECH Innovation",
+        featured: true,
+        order: 2,
+        metrics: {
+          "Recognition Accuracy": "99.5%",
+          "Processing Speed": "<1s",
+          "Global Coverage": "190+ Countries",
+          "Efficiency Gain": "+60%"
+        } as any,
+        publishedAt: new Date("2025-01-10")
+      },
+      {
         title: "PRESTIGE Car Wash",
         slug: "prestige-car-wash",
         description: "Enterprise Car Wash Service Management Platform",

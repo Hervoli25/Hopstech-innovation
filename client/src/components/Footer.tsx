@@ -43,6 +43,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/aquapulse">
+                  <a className="text-sm hover:text-blue-400 transition-colors">
+                    AquaPulse
+                  </a>
+                </Link>
+              </li>
+              <li>
                 <Link href="/portfolio">
                   <a className="text-sm hover:text-blue-400 transition-colors">
                     Portfolio
