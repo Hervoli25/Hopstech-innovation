@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { Link } from 'wouter';
 import { Code2, Search, ArrowRight, Cog, Cloud, Star } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
@@ -8,13 +8,15 @@ import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { trpc } from '../lib/trpc';
 import SkillsSection from '../components/SkillsSection';
+import ResponsiveShowcaseImage from '../components/ResponsiveShowcaseImage';
 
 const PortfolioPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const { data: projects, isLoading } = trpc.projects.getAll.useQuery({
-    search: searchQuery || undefined,
+    search: deferredSearchQuery || undefined,
     category: selectedCategory,
   });
   const { data: services, isLoading: servicesLoading } = trpc.services.getAll.useQuery();
@@ -23,41 +25,47 @@ const PortfolioPage = () => {
   const categories = ['All', 'DevOps', 'Full-Stack Development', 'Cloud Architecture'];
 
   const filteredProjects = projects || [];
+  const activeCategory = selectedCategory ?? 'All';
 
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-br from-blue-900/20 via-slate-950 to-purple-900/20">
+      <section className="bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.14),transparent_24%),linear-gradient(180deg,#020617_0%,#0f172a_52%,#020617_100%)] pt-28 pb-12 sm:pt-32 sm:pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            <h1 className="mb-5 bg-gradient-to-r from-blue-300 via-cyan-200 to-violet-300 bg-clip-text text-4xl font-bold text-transparent sm:text-5xl md:text-6xl">
               My Portfolio
             </h1>
-            <p className="text-xl text-gray-300">
-              Explore my recent projects showcasing DevOps engineering, full-stack development, and cloud architecture expertise.
+            <p className="text-base leading-7 text-gray-300 sm:text-xl sm:leading-8">
+              Explore recent projects built for real customers across DevOps engineering, full-stack development, and cloud architecture.
             </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-slate-300">
+              <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-2">Mobile-friendly case studies</span>
+              <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2">Interactive product builds</span>
+              <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-2">Cloud and platform delivery</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Filters Section */}
-      <section className="py-8 bg-slate-900/50 sticky top-16 z-40 backdrop-blur-md">
+      <section className="sticky top-16 z-40 border-y border-white/5 bg-slate-900/75 py-5 backdrop-blur-xl sm:py-6 md:top-20">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {/* Search */}
-            <div className="relative w-full md:w-96">
+            <div className="relative w-full lg:max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search projects..."
+                placeholder="Search projects, stacks, or industries"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-800 border-slate-700 text-white"
+                className="h-11 rounded-full border-slate-700 bg-slate-800/90 pl-10 text-white"
               />
             </div>
 
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {categories.map((category) => (
                 <Button
                   key={category}
@@ -66,8 +74,8 @@ const PortfolioPage = () => {
                   onClick={() => setSelectedCategory(category === 'All' ? undefined : category)}
                   className={
                     selectedCategory === (category === 'All' ? undefined : category)
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'border-slate-700 text-gray-300 hover:bg-slate-800'
+                      ? 'shrink-0 rounded-full bg-blue-600 hover:bg-blue-700'
+                      : 'shrink-0 rounded-full border-slate-700 text-gray-300 hover:bg-slate-800'
                   }
                 >
                   {category}
@@ -81,30 +89,45 @@ const PortfolioPage = () => {
       {/* Projects Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
+          <div className="mb-8 flex flex-col gap-2 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              Showing <span className="font-semibold text-white">{filteredProjects.length}</span> project{filteredProjects.length === 1 ? '' : 's'}
+            </p>
+            <p>
+              Active filter: <span className="font-semibold text-blue-300">{activeCategory}</span>
+            </p>
+          </div>
           {isLoading ? (
             <div className="text-center text-gray-400 py-20">Loading projects...</div>
           ) : filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {filteredProjects.map((project) => (
                 <Link key={project.id} href={`/portfolio/${project.slug}`}>
-                  <Card className="bg-slate-800/50 border-slate-700 hover:border-blue-500 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer group h-full">
-                    <div className="aspect-video bg-slate-700 relative overflow-hidden">
+                  <Card className="group h-full cursor-pointer overflow-hidden rounded-[1.75rem] border-slate-700/80 bg-slate-800/50 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-700 sm:aspect-video">
                       {project.thumbnail ? (
-                        <img
+                        <ResponsiveShowcaseImage
                           src={project.thumbnail}
                           alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 44vw, 30vw"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <Code2 className="h-16 w-16 text-slate-600" />
                         </div>
                       )}
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950 via-slate-950/45 to-transparent" />
                       {project.featured && (
                         <Badge className="absolute top-4 right-4 bg-blue-600">Featured</Badge>
                       )}
+                      <div className="absolute bottom-4 left-4 flex items-center gap-2 text-sm font-medium text-white">
+                        View project
+                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </div>
                     </div>
-                    <CardHeader>
+                    <CardHeader className="p-5 sm:p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-white group-hover:text-blue-400 transition-colors mb-2">
@@ -119,7 +142,7 @@ const PortfolioPage = () => {
                         {project.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-5 pt-0 sm:p-6 sm:pt-0">
                       <div className="flex flex-wrap gap-2">
                         {project.technologies && project.technologies.slice(0, 4).map((tech) => (
                           <Badge key={tech} variant="outline" className="text-xs border-slate-600 text-gray-400">

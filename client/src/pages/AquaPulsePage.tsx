@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock3,
   Droplets,
+  Expand,
   Gauge,
   Home,
   ShieldCheck,
@@ -19,10 +20,12 @@ import PageLayout from "../components/PageLayout";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
+import { Dialog, DialogContent } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { trpc } from "../lib/trpc";
+import ResponsiveShowcaseImage from "../components/ResponsiveShowcaseImage";
 
 const plans = [
   {
@@ -161,6 +164,7 @@ const fadeUp = {
 
 const AquaPulsePage = () => {
   const [selectedPlan, setSelectedPlan] = useState<(typeof plans)[number]["id"]>("connected");
+  const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -233,7 +237,7 @@ const AquaPulsePage = () => {
 
   return (
     <PageLayout>
-      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_28%),linear-gradient(180deg,#020617_0%,#071329_48%,#020617_100%)] pt-28 pb-20">
+      <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_28%),linear-gradient(180deg,#020617_0%,#071329_48%,#020617_100%)] pt-24 pb-14 sm:pt-28 sm:pb-20">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(30,41,59,0.32)_1px,transparent_1px),linear-gradient(to_bottom,rgba(30,41,59,0.32)_1px,transparent_1px)] bg-[size:5rem_5rem] opacity-30" />
         <motion.div
           className="absolute -left-12 top-24 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl"
@@ -241,7 +245,7 @@ const AquaPulsePage = () => {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="container relative z-10 mx-auto px-4">
-          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <motion.div
               className="max-w-3xl"
               initial="hidden"
@@ -249,33 +253,33 @@ const AquaPulsePage = () => {
               variants={fadeUp}
               transition={{ duration: 0.7, ease: "easeOut" }}
             >
-              <Badge className="mb-5 border-cyan-400/30 bg-cyan-500/10 px-4 py-1 text-cyan-200">
+              <Badge className="mb-5 border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-cyan-200 sm:px-4">
                 AquaPulse AP-100 | Smart water protection
               </Badge>
               <motion.h1
-                className="max-w-3xl bg-gradient-to-r from-white via-cyan-100 to-sky-300 bg-clip-text text-5xl font-black tracking-tight text-transparent md:text-6xl"
+                className="max-w-3xl bg-gradient-to-r from-white via-cyan-100 to-sky-300 bg-clip-text text-4xl font-black tracking-tight text-transparent sm:text-5xl md:text-6xl"
                 variants={fadeUp}
                 transition={{ delay: 0.12, duration: 0.7 }}
               >
                 Protect your home with intelligent water monitoring that feels simple from day one.
               </motion.h1>
               <motion.p
-                className="mt-6 max-w-2xl text-lg leading-8 text-slate-300"
+                className="mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-lg sm:leading-8"
                 variants={fadeUp}
                 transition={{ delay: 0.2, duration: 0.7 }}
               >
                 AquaPulse helps homeowners and property teams detect leaks early, stay informed in real time, and move forward with confidence before small issues become expensive damage.
               </motion.p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button size="lg" className="bg-cyan-400 text-slate-950 hover:bg-cyan-300" onClick={scrollToOrder}>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Button size="lg" className="w-full bg-cyan-400 text-slate-950 hover:bg-cyan-300 sm:w-auto" onClick={scrollToOrder}>
                   Reserve Your Device
                   <ShoppingCart className="h-4 w-4" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-cyan-400/40 text-cyan-100 hover:bg-cyan-400/10"
+                  className="w-full border-cyan-400/40 text-cyan-100 hover:bg-cyan-400/10 sm:w-auto"
                   asChild
                 >
                   <a href="#pricing">Explore Packages</a>
@@ -283,29 +287,29 @@ const AquaPulsePage = () => {
                 <Button
                   size="lg"
                   variant="ghost"
-                  className="text-slate-200 hover:bg-white/5 hover:text-white"
+                  className="w-full text-slate-200 hover:bg-white/5 hover:text-white sm:w-auto"
                   asChild
                 >
                   <Link href="/portfolio/aquapulse-smartwater">See Portfolio Case Study</Link>
                 </Button>
               </div>
 
-              <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-300">
-                <a href="#features" className="rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
+              <div className="mt-8 flex gap-3 overflow-x-auto pb-2 pr-4 text-sm text-slate-300 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <a href="#features" className="shrink-0 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
                   Features
                 </a>
-                <a href="#how-it-works" className="rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
+                <a href="#how-it-works" className="shrink-0 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
                   How it works
                 </a>
-                <a href="#pricing" className="rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
+                <a href="#pricing" className="shrink-0 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
                   Pricing
                 </a>
-                <a href="#order" className="rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
+                <a href="#order" className="shrink-0 rounded-full border border-slate-700 bg-slate-900/60 px-4 py-2 transition hover:border-cyan-400/50 hover:text-white">
                   Order form
                 </a>
               </div>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid gap-3 sm:mt-10 sm:gap-4 sm:grid-cols-3">
                 <Card className="border-cyan-500/20 bg-slate-950/70">
                   <CardContent className="p-5">
                     <div className="text-2xl font-bold text-cyan-300">&lt; 1 sec</div>
@@ -328,7 +332,7 @@ const AquaPulsePage = () => {
             </motion.div>
 
             <motion.div
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.18, duration: 0.8, ease: "easeOut" }}
@@ -339,11 +343,27 @@ const AquaPulsePage = () => {
               >
                 <Card className="overflow-hidden border-cyan-500/20 bg-slate-950/70 shadow-2xl shadow-cyan-950/40">
                   <CardContent className="p-3">
-                    <img
-                      src="/showcase/AquaDevices.png"
-                      alt="AquaPulse device dashboard preview"
-                      className="h-full w-full rounded-xl object-cover"
-                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPreviewImage({
+                          src: "/showcase/AquaDevices.png",
+                          alt: "AquaPulse device dashboard preview",
+                        })
+                      }
+                      className="group relative block w-full"
+                    >
+                      <ResponsiveShowcaseImage
+                        src="/showcase/AquaDevices.png"
+                        alt="AquaPulse device dashboard preview"
+                        className="h-full w-full rounded-xl object-cover"
+                        sizes="(max-width: 640px) 92vw, (max-width: 1200px) 40vw, 560px"
+                        fetchPriority="high"
+                      />
+                      <span className="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm transition group-hover:bg-black/75">
+                        Tap to expand
+                      </span>
+                    </button>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -351,22 +371,54 @@ const AquaPulsePage = () => {
                 <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34, duration: 0.65 }}>
                   <Card className="overflow-hidden border-slate-700 bg-slate-950/70">
                     <CardContent className="p-3">
-                      <img
-                        src="/showcase/AquaDashboard.png"
-                        alt="AquaPulse dashboard"
-                        className="h-full w-full rounded-xl object-cover"
-                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPreviewImage({
+                            src: "/showcase/AquaDashboard.png",
+                            alt: "AquaPulse dashboard",
+                          })
+                        }
+                        className="group relative block w-full"
+                      >
+                        <ResponsiveShowcaseImage
+                          src="/showcase/AquaDashboard.png"
+                          alt="AquaPulse dashboard"
+                          className="h-full w-full rounded-xl object-cover"
+                          sizes="(max-width: 640px) 92vw, (max-width: 1200px) 20vw, 280px"
+                          loading="lazy"
+                        />
+                        <span className="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm transition group-hover:bg-black/75">
+                          Expand
+                        </span>
+                      </button>
                     </CardContent>
                   </Card>
                 </motion.div>
                 <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.65 }}>
                   <Card className="overflow-hidden border-slate-700 bg-slate-950/70">
                     <CardContent className="p-3">
-                      <img
-                        src="/showcase/AquaMenu.png"
-                        alt="AquaPulse mobile menu"
-                        className="h-full w-full rounded-xl object-cover"
-                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPreviewImage({
+                            src: "/showcase/AquaMenu.png",
+                            alt: "AquaPulse mobile menu",
+                          })
+                        }
+                        className="group relative block w-full"
+                      >
+                        <ResponsiveShowcaseImage
+                          src="/showcase/AquaMenu.png"
+                          alt="AquaPulse mobile menu"
+                          className="h-full w-full rounded-xl object-cover"
+                          sizes="(max-width: 640px) 92vw, (max-width: 1200px) 20vw, 280px"
+                          loading="lazy"
+                        />
+                        <span className="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm transition group-hover:bg-black/75">
+                          Expand
+                        </span>
+                      </button>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -376,7 +428,28 @@ const AquaPulsePage = () => {
         </div>
       </section>
 
-      <section id="features" className="scroll-mt-28 bg-slate-950 py-20">
+      <Dialog open={Boolean(previewImage)} onOpenChange={(open) => !open && setPreviewImage(null)}>
+        <DialogContent className="max-w-[96vw] border-slate-800 bg-slate-950 p-3 sm:p-5 text-white">
+          <div className="flex items-center justify-between gap-3 px-1 pb-2">
+            <div>
+              <p className="text-sm font-semibold text-white">AquaPulse preview</p>
+              <p className="text-xs text-slate-400">Expanded mobile-friendly view</p>
+            </div>
+            <Expand className="h-4 w-4 text-slate-400" />
+          </div>
+          <div className="flex min-h-[72vh] items-center justify-center overflow-hidden rounded-xl bg-black">
+            {previewImage ? (
+              <img
+                src={previewImage.src}
+                alt={previewImage.alt}
+                className="max-h-[80vh] w-full object-contain"
+              />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <section id="features" className="scroll-mt-28 bg-slate-950 py-16 sm:py-20">
         <div className="container mx-auto px-4">
           <motion.div
             className="max-w-2xl"
@@ -416,7 +489,7 @@ const AquaPulsePage = () => {
             ))}
           </div>
 
-          <div className="mt-8 grid gap-4 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid gap-4 rounded-3xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6 md:grid-cols-2 xl:grid-cols-3">
             {includedFeatures.map((feature) => (
               <div key={feature} className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 text-cyan-300" />
@@ -427,7 +500,7 @@ const AquaPulsePage = () => {
         </div>
       </section>
 
-      <section id="how-it-works" className="scroll-mt-28 bg-slate-900/40 py-20">
+      <section id="how-it-works" className="scroll-mt-28 bg-slate-900/40 py-16 sm:py-20">
         <div className="container mx-auto px-4">
           <motion.div
             className="max-w-2xl"
@@ -469,9 +542,9 @@ const AquaPulsePage = () => {
         </div>
       </section>
 
-      <section className="bg-slate-950 py-20">
+      <section className="bg-slate-950 py-16 sm:py-20">
         <div className="container mx-auto px-4">
-          <div className="grid gap-8 rounded-[2rem] border border-cyan-500/20 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_45%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-8 shadow-2xl shadow-cyan-950/20 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="grid gap-6 rounded-[2rem] border border-cyan-500/20 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_45%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-5 sm:gap-8 sm:p-8 shadow-2xl shadow-cyan-950/20 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="max-w-2xl">
               <Badge className="border-cyan-400/30 bg-cyan-500/10 text-cyan-200">AquaPulse App</Badge>
               <h2 className="mt-4 bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">The AquaPulse app is on the way.</h2>
@@ -527,7 +600,7 @@ const AquaPulsePage = () => {
         </div>
       </section>
 
-      <section id="pricing" className="scroll-mt-28 bg-slate-950 py-20">
+      <section id="pricing" className="scroll-mt-28 bg-slate-950 py-16 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
@@ -539,7 +612,7 @@ const AquaPulsePage = () => {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-6 xl:grid-cols-3">
+          <div className="mt-8 grid gap-5 xl:grid-cols-3 sm:mt-10 sm:gap-6">
             {plans.map((plan) => {
               const isSelected = plan.id === selectedPlan;
 
@@ -549,7 +622,7 @@ const AquaPulsePage = () => {
                   className={`relative overflow-hidden border-slate-800 bg-slate-900/70 shadow-xl transition hover:-translate-y-1 ${plan.glowClass} ${isSelected ? plan.accent : ""}`}
                 >
                   <div className={`absolute inset-x-0 top-0 h-1 ${plan.id === "starter" ? "bg-cyan-300/90" : plan.id === "connected" ? "bg-emerald-300/90" : "bg-amber-300/90"}`} />
-                  <CardContent className="p-7">
+                  <CardContent className="p-5 sm:p-7">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className={`text-sm uppercase tracking-[0.24em] ${plan.noteClass}`}>{plan.note}</p>
@@ -593,7 +666,7 @@ const AquaPulsePage = () => {
         </div>
       </section>
 
-      <section id="order" className="scroll-mt-28 bg-[linear-gradient(180deg,#08111f_0%,#020617_100%)] py-20">
+      <section id="order" className="scroll-mt-28 bg-[linear-gradient(180deg,#08111f_0%,#020617_100%)] py-16 sm:py-20">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr]">
             <div className="space-y-6">
@@ -641,7 +714,7 @@ const AquaPulsePage = () => {
             </div>
 
             <Card className="border-slate-800 bg-slate-900/80">
-              <CardContent className="p-6 sm:p-8">
+              <CardContent className="p-5 sm:p-8">
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid gap-6 md:grid-cols-2">
                     <div className="space-y-2">
