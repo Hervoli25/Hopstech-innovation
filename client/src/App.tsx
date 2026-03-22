@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
+import AnalyticsScript from "./components/AnalyticsScript";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ScrollProgress } from "./components/animations/ScrollProgress";
@@ -62,6 +63,7 @@ function App() {
       >
         <TooltipProvider>
           <ScrollProgress />
+          <AnalyticsScript />
           <Toaster />
           <Suspense fallback={<RouteLoader />}>
             <Router />

@@ -174,37 +174,6 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes("node_modules")) {
-            return undefined;
-          }
-
-          if (id.includes("@react-three") || id.includes("node_modules/three") || id.includes("node_modules\\three")) {
-            return "three";
-          }
-
-          if (id.includes("@radix-ui")) {
-            return "radix";
-          }
-
-          if (id.includes("@trpc") || id.includes("@tanstack/react-query") || id.includes("superjson")) {
-            return "data";
-          }
-
-          if (id.includes("framer-motion") || id.includes("embla-carousel") || id.includes("lucide-react") || id.includes("sonner")) {
-            return "ui-motion";
-          }
-
-          if (id.includes("recharts")) {
-            return "charts";
-          }
-
-          return "vendor";
-        },
-      },
-    },
   },
   server: {
     host: true,
