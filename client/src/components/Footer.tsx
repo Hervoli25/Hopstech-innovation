@@ -28,7 +28,7 @@ const Footer = () => {
                 <img
                   src="/logo.png"
                   alt="Hopstec Innovation Logo"
-                  className="h-12 w-12 rounded-full ring-2 ring-[var(--hopstec-teal)]/50"
+                  className="h-12 w-12 rounded-full bg-white p-0.5 ring-2 ring-[var(--hopstec-teal)]/50"
                 />
                 <span className="text-xl font-bold text-white">
                   {enterpriseFooter.companyName}

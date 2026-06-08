@@ -231,6 +231,53 @@ export const enterpriseCaseStudies = {
   ] satisfies EnterpriseCaseStudy[],
 };
 
+export const enterpriseMetrics = [
+  { value: "5+", label: "Products shipped" },
+  { value: "4", label: "Industry verticals" },
+  { value: "Paris", label: "Headquarters" },
+  { value: "Full-stack", label: "Design to deployment" },
+];
+
+export const enterpriseHowWeShip = {
+  title: "How we ship",
+  intro:
+    "Every engagement follows a disciplined delivery model — from discovery and architecture through automated testing, staging, and production deployment. Your team inherits systems they can own.",
+  stages: [
+    { name: "Discover", desc: "Define the problem, scope, and success criteria" },
+    { name: "Architect", desc: "Design systems around your workflows and constraints" },
+    { name: "Build", desc: "Iterative development with continuous feedback" },
+    { name: "Test", desc: "Automated quality gates at every stage" },
+    { name: "Deploy", desc: "Staging validation before production release" },
+    { name: "Operate", desc: "Monitoring, handover, and long-term support" },
+  ],
+};
+
+export const enterpriseClientVisibility = {
+  badge: "For Clients",
+  title: "Work with full visibility",
+  intro:
+    "Every client gets a dedicated portal to track progress, review deliverables, manage payments, and communicate directly — no chasing updates by email.",
+  features: [
+    {
+      title: "Secure Access",
+      description: "Passwordless magic-link authentication — no credentials to manage",
+    },
+    {
+      title: "Project Dashboard",
+      description: "Live progress, milestones, phases, and deliverable tracking",
+    },
+    {
+      title: "Direct Communication",
+      description: "Messaging, support tickets, and activity logs in one place",
+    },
+    {
+      title: "Payment Transparency",
+      description: "Invoice tracking, installment schedules, and milestone-linked payments",
+    },
+  ],
+  cta: "Access your portal",
+};
+
 export const enterpriseFooter = {
   companyName: "Hopstec Innovation",
   address: "47 Rue Vivienne, 75002 Paris, France",

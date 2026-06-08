@@ -65,7 +65,7 @@ const Navigation = () => {
               <img
                 src="/logo.png"
                 alt="Hopstec Innovation Logo"
-                className="h-12 w-12 rounded-full ring-2 ring-[var(--hopstec-teal)]/50 shadow-lg shadow-[var(--hopstec-teal)]/20 transition-all duration-300 group-hover:scale-110"
+                className="h-12 w-12 rounded-full bg-white p-0.5 ring-2 ring-[var(--hopstec-teal)]/50 shadow-lg shadow-[var(--hopstec-teal)]/20 transition-all duration-300 group-hover:scale-110"
               />
             </div>
             <span className="bg-clip-text text-xl font-bold text-transparent bg-gradient-to-r from-[var(--hopstec-teal)] via-cyan-300 to-blue-400">
