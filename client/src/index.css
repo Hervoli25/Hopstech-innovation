@@ -43,6 +43,8 @@
 }
 
 :root {
+  --hopstec-teal: #00C896;
+  --hopstec-footer-bg: #0E0E1C;
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
   --sidebar-primary: var(--color-blue-600);

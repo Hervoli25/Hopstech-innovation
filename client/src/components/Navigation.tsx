@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { enterpriseFooter } from '@/content/enterprise';
+import { handleSectionLink } from '@/lib/scrollToSection';
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -30,12 +32,23 @@ const Navigation = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/aquapulse', label: 'AquaPulse' },
-    { href: '/portfolio', label: 'Portfolio' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  const navLinks = enterpriseFooter.navLinks;
+
+  const handleNavClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (handleSectionLink(href, () => setIsMobileMenuOpen(false))) {
+      event.preventDefault();
+    }
+  };
+
+  const isActive = (href: string) => {
+    if (href.startsWith('/#')) {
+      return location === '/';
+    }
+    return location === href;
+  };
 
   return (
     <nav
@@ -46,50 +59,57 @@ const Navigation = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 text-white hover:opacity-90 transition-all group">
+        <div className="flex h-16 items-center justify-between md:h-20">
+          <Link href="/" className="group flex items-center space-x-3 text-white transition-all hover:opacity-90">
             <div className="relative">
               <img
                 src="/logo.png"
-                alt="HOPSTECH INNOVATION Logo"
-                className="h-12 w-12 rounded-full ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/30 group-hover:ring-blue-400 group-hover:shadow-blue-400/40 transition-all duration-300 group-hover:scale-110"
+                alt="Hopstec Innovation Logo"
+                className="h-12 w-12 rounded-full ring-2 ring-[var(--hopstec-teal)]/50 shadow-lg shadow-[var(--hopstec-teal)]/20 transition-all duration-300 group-hover:scale-110"
               />
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400/20 to-purple-500/20 group-hover:from-blue-400/30 group-hover:to-purple-500/30 transition-all duration-300"></div>
             </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">
+            <span className="bg-clip-text text-xl font-bold text-transparent bg-gradient-to-r from-[var(--hopstec-teal)] via-cyan-300 to-blue-400">
               <span className="block max-w-[10rem] text-sm leading-tight sm:max-w-none sm:text-base md:text-xl">
-                HOPSTECH INNOVATION
+                Hopstec Innovation
               </span>
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
+          <div className="hidden items-center space-x-8 md:flex">
+            {navLinks.map((link) =>
+              link.href.startsWith('/#') ? (
                 <a
-                  className={`text-sm font-medium transition-colors hover:text-blue-400 ${
-                    location === link.href
-                      ? 'text-blue-400'
-                      : 'text-gray-300'
+                  key={link.href}
+                  href={link.href}
+                  onClick={(event) => handleNavClick(event, link.href)}
+                  className={`text-sm font-medium transition-colors hover:text-[var(--hopstec-teal)] ${
+                    isActive(link.href) ? 'text-[var(--hopstec-teal)]' : 'text-gray-300'
                   }`}
                 >
                   {link.label}
                 </a>
-              </Link>
-            ))}
+              ) : (
+                <Link key={link.href} href={link.href}>
+                  <a
+                    className={`text-sm font-medium transition-colors hover:text-[var(--hopstec-teal)] ${
+                      isActive(link.href) ? 'text-[var(--hopstec-teal)]' : 'text-gray-300'
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                </Link>
+              )
+            )}
             <Link href="/client-portal">
               <Button
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 text-white hover:bg-blue-700"
               >
-                Let's Build
+                Client Portal
               </Button>
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="rounded-full border border-white/10 bg-slate-900/70 p-2 text-white shadow-lg backdrop-blur-sm md:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -104,39 +124,55 @@ const Navigation = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="pb-4 md:hidden">
             <div className="rounded-[1.75rem] border border-white/10 bg-slate-900/95 p-4 shadow-2xl backdrop-blur-xl">
-              <div className="mb-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4">
-                <p className="text-xs uppercase tracking-[0.24em] text-cyan-200/80">Explore</p>
+              <div className="mb-4 rounded-2xl border border-[var(--hopstec-teal)]/20 bg-[var(--hopstec-teal)]/5 p-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-[var(--hopstec-teal)]/80">
+                  Hopstec Innovation
+                </p>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
-                  Browse AquaPulse, portfolio projects, and ways to start working together from your phone.
+                  Paris-based software consultancy. Explore our services, case studies, and ways to get in touch.
                 </p>
               </div>
               <div className="flex flex-col gap-2">
-                {navLinks.map((link) => (
-                  <Link key={link.href} href={link.href}>
+                {navLinks.map((link) =>
+                  link.href.startsWith('/#') ? (
                     <a
-                      className={`rounded-2xl px-4 py-3 text-sm font-medium transition-colors hover:text-blue-400 ${
-                        location === link.href
-                          ? 'bg-blue-500/10 text-blue-400'
+                      key={link.href}
+                      href={link.href}
+                      onClick={(event) => handleNavClick(event, link.href)}
+                      className={`rounded-2xl px-4 py-3 text-sm font-medium transition-colors hover:text-[var(--hopstec-teal)] ${
+                        isActive(link.href)
+                          ? 'bg-[var(--hopstec-teal)]/10 text-[var(--hopstec-teal)]'
                           : 'text-gray-300 hover:bg-slate-800/80'
                       }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {link.label}
                     </a>
-                  </Link>
-                ))}
+                  ) : (
+                    <Link key={link.href} href={link.href}>
+                      <a
+                        className={`rounded-2xl px-4 py-3 text-sm font-medium transition-colors hover:text-[var(--hopstec-teal)] ${
+                          isActive(link.href)
+                            ? 'bg-[var(--hopstec-teal)]/10 text-[var(--hopstec-teal)]'
+                            : 'text-gray-300 hover:bg-slate-800/80'
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {link.label}
+                      </a>
+                    </Link>
+                  )
+                )}
                 <div className="pt-2">
                   <Link href="/client-portal">
                     <Button
                       size="sm"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      Let's Build
+                      Client Portal
                     </Button>
                   </Link>
                 </div>
