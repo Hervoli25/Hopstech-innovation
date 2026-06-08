@@ -94,11 +94,11 @@ The Talaria Dashboard has transformed semiconductor manufacturing logistics oper
 
 **The Problem**
 
-Water damage is one of the most expensive and underestimated risks in homes. Leaks often go unnoticed for hours or days — causing thousands in damage. At the same time, water waste continues silently, increasing your bills.
+Water damage is one of the most expensive and underestimated risks in homes. Leaks often go unnoticed for hours or days, causing thousands in damage. At the same time, water waste continues silently, increasing your bills.
 
 **The Solution**
 
-AquaPulse gives you full control over your water usage. It monitors your water flow in real time, detects abnormal behavior, and reacts instantly. In case of a leak, AquaPulse can automatically shut off your water — before damage happens.
+AquaPulse gives you full control over your water usage. It monitors your water flow in real time, detects abnormal behavior, and reacts instantly. In case of a leak, AquaPulse can automatically shut off your water before damage happens.
 
 **How It Works**
 
@@ -119,7 +119,7 @@ Simple. Intelligent. Autonomous.
 
 **The Story**
 
-AquaPulse was inspired by real-world water scarcity. During a severe drought in Cape Town, strict water restrictions revealed how inefficient and unmanaged water usage can be. This experience led to the creation of AquaPulse — a smarter way to manage water at home.`,
+AquaPulse was inspired by real-world water scarcity. During a severe drought in Cape Town, strict water restrictions revealed how inefficient and unmanaged water usage can be. This experience led to the creation of AquaPulse, a smarter way to manage water at home.`,
         thumbnail: "/showcase/AquaDashboard.png",
         images: [
           "/showcase/AquaDashboard.png",

@@ -167,7 +167,7 @@ export function ProjectStory() {
                   {phase.testimonial && (
                     <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-6">
                       <p className="text-gray-300 italic text-lg">"{phase.testimonial}"</p>
-                      <p className="text-sm text-gray-400 mt-2">— Client CEO</p>
+                      <p className="text-sm text-gray-400 mt-2">Client CEO</p>
                     </div>
                   )}
                 </CardContent>

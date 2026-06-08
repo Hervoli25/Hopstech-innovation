@@ -38,7 +38,7 @@ const HowWeShipSection = () => {
                 </div>
                 <div className="border-t border-slate-700 bg-slate-900/50 p-4">
                   <p className="text-center text-sm text-gray-400">
-                    Interactive 3D pipeline — drag to explore our delivery workflow
+                    Interactive 3D pipeline. Drag to explore our delivery workflow.
                   </p>
                 </div>
               </CardContent>

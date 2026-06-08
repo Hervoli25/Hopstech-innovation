@@ -22,9 +22,9 @@ export const enterpriseAbout = {
   title: "Who we are",
   paragraphs: [
     "Hopstec Innovation was built on a straightforward belief: the right software, built properly, changes what an organisation can do. Not incrementally. Fundamentally.",
-    "We are a Paris-based software consultancy specialising in custom web and mobile development, DevOps infrastructure, and operational automation. We work with businesses that need a technical partner who understands both the engineering and the business problem behind it — and who stays accountable from the first line of code to the final deployment.",
-    "Alongside our consultancy work, we build our own products. Our current flagship is 20Hecto — a precision metabolic nutrition platform for people managing endocrine and metabolic conditions including diabetes, PCOS, and thyroid disorders. 20Hecto goes beyond calorie counting, tracking what actually matters for metabolic health: glycaemic load, blood glucose patterns, lab value trends, fasting windows, and medication adherence. It is connected to a Practitioner Portal verified through the French RPPS registry, so patients and their care teams work from the same data. It is live on Google Play.",
-    "Building 20Hecto taught us something important: the best software is not the most technically impressive. It is the most honest — built around a real problem, with real people at the centre of every decision.",
+    "We are a Paris-based software consultancy specialising in custom web and mobile development, DevOps infrastructure, and operational automation. We work with businesses that need a technical partner who understands both the engineering and the business problem behind it, and who stays accountable from the first line of code to the final deployment.",
+    "Alongside our consultancy work, we build our own products. Our current flagship is 20Hecto, a precision metabolic nutrition platform for people managing endocrine and metabolic conditions including diabetes, PCOS, and thyroid disorders. 20Hecto goes beyond calorie counting, tracking what actually matters for metabolic health: glycaemic load, blood glucose patterns, lab value trends, fasting windows, and medication adherence. It is connected to a Practitioner Portal verified through the French RPPS registry, so patients and their care teams work from the same data. It is live on Google Play.",
+    "Building 20Hecto taught us something important: the best software is not the most technically impressive. It is the most honest, built around a real problem, with real people at the centre of every decision.",
     "That is the standard we bring to every client project. Hopstec Innovation. 47 Rue Vivienne, 75002 Paris.",
   ],
 };
@@ -38,12 +38,12 @@ export type EnterpriseService = {
 export const enterpriseServices = {
   title: "What we build",
   intro:
-    "We work across the full stack — from product design and development to deployment, automation, and ongoing infrastructure. Every engagement starts with the problem, not the technology.",
+    "We work across the full stack, from product design and development to deployment, automation, and ongoing infrastructure. Every engagement starts with the problem, not the technology.",
   items: [
     {
       icon: Globe,
       title: "Custom Web and Mobile Applications",
-      body: "We design and build web applications and mobile products from the ground up. Whether you need a client-facing platform, an internal management tool, or a consumer app, we build it around your specific workflows and your users — not around a template. Our stack covers React, Next.js, Django, Flask, Node.js, and Tailwind CSS, deployed on infrastructure that scales with your growth.",
+      body: "We design and build web applications and mobile products from the ground up. Whether you need a client-facing platform, an internal management tool, or a consumer app, we build it around your specific workflows and your users, not around a template. Our stack covers React, Next.js, Django, Flask, Node.js, and Tailwind CSS, deployed on infrastructure that scales with your growth.",
     },
     {
       icon: Server,
@@ -53,7 +53,7 @@ export const enterpriseServices = {
     {
       icon: Workflow,
       title: "Automation and Internal Tooling",
-      body: "Manual processes that run on spreadsheets and emails are a liability. We build internal automation systems — logistics pipelines, scheduling tools, operational dashboards, and workflow integrations — that reduce the time your team spends on repetitive tasks and increase the reliability of the output. Our automation work draws directly from production systems we have built and maintained in demanding industrial environments.",
+      body: "Manual processes that run on spreadsheets and emails are a liability. We build internal automation systems, including logistics pipelines, scheduling tools, operational dashboards, and workflow integrations, that reduce the time your team spends on repetitive tasks and increase the reliability of the output. Our automation work draws directly from production systems we have built and maintained in demanding industrial environments.",
     },
     {
       icon: HeartPulse,
@@ -63,7 +63,7 @@ export const enterpriseServices = {
     {
       icon: Cpu,
       title: "IoT and Connected Devices",
-      body: "We design and build connected hardware and software systems — from embedded firmware on microcontrollers to cloud backends, MQTT brokers, and real-time dashboards. Our IoT work covers device communication, remote monitoring, data ingestion pipelines, and the full integration between physical hardware and the software that manages it.",
+      body: "We design and build connected hardware and software systems, from embedded firmware on microcontrollers to cloud backends, MQTT brokers, and real-time dashboards. Our IoT work covers device communication, remote monitoring, data ingestion pipelines, and the full integration between physical hardware and the software that manages it.",
     },
     {
       icon: Brain,
@@ -97,17 +97,17 @@ export const enterpriseCaseStudies = {
   items: [
     {
       id: "20hecto",
-      title: "20Hecto — Precision Metabolic Nutrition",
+      title: "20Hecto: Precision Metabolic Nutrition",
       tags: ["HealthTech", "Web and Mobile", "AI Integration"],
       summary:
-        "A full-stack precision nutrition platform for people managing diabetes, PCOS, thyroid disorders, and insulin resistance — with clinical integration via the French RPPS registry.",
+        "A full-stack precision nutrition platform for people managing diabetes, PCOS, thyroid disorders, and insulin resistance, with clinical integration via the French RPPS registry.",
       techStack: "React 19, Node.js, Neon PostgreSQL",
       deployment: "app.20hecto.com",
       url: "https://app.20hecto.com",
       details: [
         {
           heading: "The Problem",
-          body: "People managing diabetes, PCOS, thyroid disorders, and insulin resistance had no nutrition tool built around the complexity of their conditions. Every existing option was designed for weight loss through calorie counting — the wrong metric for metabolic health.",
+          body: "People managing diabetes, PCOS, thyroid disorders, and insulin resistance had no nutrition tool built around the complexity of their conditions. Every existing option was designed for weight loss through calorie counting, the wrong metric for metabolic health.",
         },
         {
           heading: "The Solution",
@@ -115,7 +115,7 @@ export const enterpriseCaseStudies = {
         },
         {
           heading: "Clinical Integration",
-          body: "The Practitioner Portal allows dietitians and endocrinologists verified through the French RPPS registry to access a patient's full clinical summary — with consent managed entirely by the patient via a one-time six-digit code.",
+          body: "The Practitioner Portal allows dietitians and endocrinologists verified through the French RPPS registry to access a patient's full clinical summary, with consent managed entirely by the patient via a one-time six-digit code.",
         },
         {
           heading: "Status",
@@ -125,7 +125,7 @@ export const enterpriseCaseStudies = {
     },
     {
       id: "talaria",
-      title: "Talaria — Logistics and Shipment Dashboard",
+      title: "Talaria: Logistics and Shipment Dashboard",
       tags: ["Internal Tooling", "Web Application", "Automation"],
       summary:
         "A Flask-based internal logistics dashboard that centralised shipment tracking and gave operations teams real-time visibility into every active shipment.",
@@ -148,7 +148,7 @@ export const enterpriseCaseStudies = {
     },
     {
       id: "aquapulse",
-      title: "AquaPulse AP-100 — Smart Water Management",
+      title: "AquaPulse AP-100: Smart Water Management",
       tags: ["IoT", "Embedded Hardware", "Cloud Backend"],
       summary:
         "An ESP32-based IoT device for real-time water flow monitoring, with MQTT cloud integration and a live facility dashboard.",
@@ -166,13 +166,13 @@ export const enterpriseCaseStudies = {
         },
         {
           heading: "Additional Work",
-          body: "The product includes full CE homologation documentation, INPI patent filing, and product packaging — developed end to end by Hopstec Innovation.",
+          body: "The product includes full CE homologation documentation, INPI patent filing, and product packaging, developed end to end by Hopstec Innovation.",
         },
       ],
     },
     {
       id: "prestige",
-      title: "Prestige by Ekhaya — Car Wash Management Platform",
+      title: "Prestige by Ekhaya: Car Wash Management Platform",
       tags: ["Web Application", "Business Operations", "Full Stack"],
       summary:
         "A Next.js and Prisma platform managing the full operational lifecycle of a car wash business in Cape Town.",
@@ -196,7 +196,7 @@ export const enterpriseCaseStudies = {
     },
     {
       id: "guardian",
-      title: "Guardian — AI Threat Investigation Workspace",
+      title: "Guardian: AI Threat Investigation Workspace",
       tags: ["CyberSecurity", "AI Integration", "Workflow Orchestration"],
       summary:
         "A Django-based threat investigation workspace combining three AI-assisted fraud detection agents with Temporal workflow orchestration.",
@@ -216,7 +216,7 @@ export const enterpriseCaseStudies = {
         },
         {
           heading: "Architecture",
-          body: "Investigations run outside the normal HTTP request cycle via Temporal, which sequences agent execution, handles transient failures with automatic retries, and persists workflow state across app restarts. Each agent stores its own source record and analysis result. The master pipeline then computes an aggregate risk level — Critical, High, Medium, or Low. Every run is traceable via a Workflow ID.",
+          body: "Investigations run outside the normal HTTP request cycle via Temporal, which sequences agent execution, handles transient failures with automatic retries, and persists workflow state across app restarts. Each agent stores its own source record and analysis result. The master pipeline then computes an aggregate risk level: Critical, High, Medium, or Low. Every run is traceable via a Workflow ID.",
         },
         {
           heading: "Operational Features",
@@ -241,7 +241,7 @@ export const enterpriseMetrics = [
 export const enterpriseHowWeShip = {
   title: "How we ship",
   intro:
-    "Every engagement follows a disciplined delivery model — from discovery and architecture through automated testing, staging, and production deployment. Your team inherits systems they can own.",
+    "Every engagement follows a disciplined delivery model, from discovery and architecture through automated testing, staging, and production deployment. Your team inherits systems they can own.",
   stages: [
     { name: "Discover", desc: "Define the problem, scope, and success criteria" },
     { name: "Architect", desc: "Design systems around your workflows and constraints" },
@@ -256,11 +256,11 @@ export const enterpriseClientVisibility = {
   badge: "For Clients",
   title: "Work with full visibility",
   intro:
-    "Every client gets a dedicated portal to track progress, review deliverables, manage payments, and communicate directly — no chasing updates by email.",
+    "Every client gets a dedicated portal to track progress, review deliverables, manage payments, and communicate directly, with no chasing updates by email.",
   features: [
     {
       title: "Secure Access",
-      description: "Passwordless magic-link authentication — no credentials to manage",
+      description: "Passwordless magic-link authentication, with no credentials to manage",
     },
     {
       title: "Project Dashboard",
