@@ -177,7 +177,8 @@ export const enterpriseCaseStudies = {
       summary:
         "A Next.js and Prisma platform managing the full operational lifecycle of a car wash business in Cape Town.",
       techStack: "Next.js, Prisma, PostgreSQL",
-      deployment: "Cape Town, South Africa deployment",
+      deployment: "prestigebyekhaya.com",
+      url: "https://prestigebyekhaya.com/",
       details: [
         {
           heading: "The Problem",
