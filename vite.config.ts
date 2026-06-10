@@ -30,10 +30,10 @@ const plugins = [
       'logo.png'
     ],
     manifest: {
-      name: 'HOPSTECH Client Portal',
-      short_name: 'HOPSTECH',
-      description: 'Manage your projects, invoices, and communications with HOPSTECH',
-      theme_color: '#2563eb',
+      name: 'Hopstec Innovation Client Portal',
+      short_name: 'Hopstec',
+      description: 'Track projects, invoices, and communications with Hopstec Innovation',
+      theme_color: '#00C896',
       background_color: '#0f172a',
       display: 'standalone',
       scope: '/',

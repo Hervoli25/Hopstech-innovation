@@ -1,7 +1,7 @@
 {
-  "name": "HOPSTECH Client Portal",
-  "short_name": "HOPSTECH",
-  "description": "Manage your projects, invoices, and communications with HOPSTECH",
+  "name": "Hopstec Innovation Client Portal",
+  "short_name": "Hopstec",
+  "description": "Track projects, invoices, and communications with Hopstec Innovation",
   "start_url": "/client-portal",
   "display": "standalone",
   "background_color": "#0f172a",
