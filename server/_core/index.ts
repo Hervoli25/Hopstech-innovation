@@ -43,6 +43,11 @@ async function startServer() {
       createContext,
     })
   );
+
+  app.get(["/portfolio", "/portfolio/:slug"], (_req, res) => {
+    res.redirect(301, "/");
+  });
+
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

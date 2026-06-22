@@ -8,6 +8,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
+import { enterpriseFooter } from '@/content/enterprise';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -109,8 +110,8 @@ const ContactPage = () => {
                   <div className="flex items-start space-x-3">
                     <MapPin className="h-5 w-5 text-blue-400 mt-1" />
                     <div>
-                      <div className="text-sm text-gray-400 mb-1">Location</div>
-                      <div className="text-white">France</div>
+                      <div className="text-sm text-gray-400 mb-1">Headquarters</div>
+                      <div className="text-white">{enterpriseFooter.address}</div>
                     </div>
                   </div>
                 </CardContent>

@@ -1,5 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  COMPANY_ADDRESS,
+  COMPANY_EMAIL,
+  COMPANY_NAME,
+  COMPANY_WEBSITE,
+} from "@shared/const";
+import {
   Brain,
   Cpu,
   Globe,
@@ -25,7 +31,7 @@ export const enterpriseAbout = {
     "We are a Paris-based software consultancy specialising in custom web and mobile development, DevOps infrastructure, and operational automation. We work with businesses that need a technical partner who understands both the engineering and the business problem behind it, and who stays accountable from the first line of code to the final deployment.",
     "Alongside our consultancy work, we build our own products. Our current flagship is 20Hecto, a precision metabolic nutrition platform for people managing endocrine and metabolic conditions including diabetes, PCOS, and thyroid disorders. 20Hecto goes beyond calorie counting, tracking what actually matters for metabolic health: glycaemic load, blood glucose patterns, lab value trends, fasting windows, and medication adherence. It is connected to a Practitioner Portal verified through the French RPPS registry, so patients and their care teams work from the same data. It is live on Google Play.",
     "Building 20Hecto taught us something important: the best software is not the most technically impressive. It is the most honest, built around a real problem, with real people at the centre of every decision.",
-    "That is the standard we bring to every client project. Hopstec Innovation. 47 Rue Vivienne, 75002 Paris.",
+    `That is the standard we bring to every client project. ${COMPANY_NAME}. ${COMPANY_ADDRESS}.`,
   ],
 };
 
@@ -279,11 +285,11 @@ export const enterpriseClientVisibility = {
 };
 
 export const enterpriseFooter = {
-  companyName: "Hopstec Innovation",
-  address: "47 Rue Vivienne, 75002 Paris, France",
-  website: "hopstecinnovation.com",
-  websiteUrl: "https://hopstecinnovation.com",
-  email: "info@hopstecinnovation.com",
+  companyName: COMPANY_NAME,
+  address: COMPANY_ADDRESS,
+  website: COMPANY_WEBSITE.replace(/^https?:\/\//, ""),
+  websiteUrl: COMPANY_WEBSITE,
+  email: COMPANY_EMAIL,
   navLinks: [
     { label: "About", href: "/#about" },
     { label: "Services", href: "/#services" },

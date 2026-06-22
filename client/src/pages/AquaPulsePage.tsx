@@ -290,7 +290,7 @@ const AquaPulsePage = () => {
                   className="w-full text-slate-200 hover:bg-white/5 hover:text-white sm:w-auto"
                   asChild
                 >
-                  <Link href="/portfolio/aquapulse-smartwater">See Portfolio Case Study</Link>
+                  <Link href="/#case-studies">See case study on our site</Link>
                 </Button>
               </div>
 

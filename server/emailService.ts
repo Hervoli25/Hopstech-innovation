@@ -5,6 +5,9 @@
  */
 
 import { Resend } from 'resend';
+import { COMPANY_ADDRESS, COMPANY_NAME } from '@shared/const';
+
+const emailCompanyFooter = `${COMPANY_NAME} · ${COMPANY_ADDRESS}`;
 
 export interface MagicLinkEmailData {
   to: string;
@@ -161,6 +164,9 @@ export async function sendMagicLinkEmail(data: MagicLinkEmailData): Promise<void
                     If you didn't request this email, you can safely ignore it.
                   </p>
                   <p style="margin: 20px 0 0 0; color: #475569; font-size: 12px; text-align: center;">
+                    ${emailCompanyFooter}
+                  </p>
+                  <p style="margin: 8px 0 0 0; color: #475569; font-size: 12px; text-align: center;">
                     © ${new Date().getFullYear()} HOPSTECH INNOVATION. All rights reserved.
                   </p>
                 </td>
@@ -186,6 +192,7 @@ If you didn't request this email, you can safely ignore it.
 
 ---
 © ${new Date().getFullYear()} HOPSTECH INNOVATION
+${emailCompanyFooter}
   `.trim();
 
   try {
