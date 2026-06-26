@@ -1,4 +1,5 @@
 import { Linkedin } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { Card, CardContent } from "@/components/ui/card";
 import { enterpriseFounder } from "@/content/enterprise";
@@ -11,11 +12,7 @@ const FounderSection = () => {
           <Card className="border-slate-800 bg-slate-900/50">
             <CardContent className="flex flex-col items-center gap-6 p-8 text-center md:flex-row md:text-left">
               <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--hopstec-teal)]/20 to-blue-600/20 ring-2 ring-[var(--hopstec-teal)]/40">
-                <img
-                  src="/logo.png"
-                  alt={enterpriseFounder.name}
-                  className="h-16 w-16 rounded-full bg-white p-0.5"
-                />
+                <BrandLogo size="lg" showRing={false} />
               </div>
               <div className="flex-1">
                 <p className="text-xs uppercase tracking-[0.24em] text-[var(--hopstec-teal)]">

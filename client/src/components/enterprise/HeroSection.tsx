@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/BrandLogo";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { enterpriseHero } from "@/content/enterprise";
 import { handleSectionLink } from "@/lib/scrollToSection";
@@ -23,11 +24,7 @@ const HeroSection = () => {
       <div className="container relative z-10 mx-auto px-4">
         <FadeIn className="mx-auto max-w-4xl text-center">
           <div className="mb-8 flex justify-center">
-            <img
-              src="/logo.png"
-              alt="Hopstec Innovation"
-              className="h-24 w-24 rounded-full bg-white p-1 shadow-2xl shadow-[var(--hopstec-teal)]/20 ring-2 ring-[var(--hopstec-teal)]/40 md:h-28 md:w-28"
-            />
+            <BrandLogo size="hero" className="shadow-2xl" />
           </div>
           <div className="mb-6 inline-block">
             <Badge

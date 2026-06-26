@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   ArrowRight,
   BarChart3,
@@ -38,11 +39,7 @@ const ClientVisibilitySection = () => {
                 <div className="rounded-lg border border-slate-700 bg-slate-900 p-6">
                   <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <img
-                        src="/logo.png"
-                        alt="Hopstec Innovation"
-                        className="h-10 w-10 rounded-full ring-2 ring-[var(--hopstec-teal)]/40"
-                      />
+                      <BrandLogo size="sm" showRing={false} />
                       <div>
                         <p className="font-medium text-white">Client Dashboard</p>
                         <p className="text-xs text-gray-400">portal.hopstecinnovation.com</p>

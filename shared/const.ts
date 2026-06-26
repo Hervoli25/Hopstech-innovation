@@ -2,6 +2,8 @@ export const COMPANY_NAME = "Hopstec Innovation";
 export const COMPANY_ADDRESS = "47 Rue Vivienne, 75002 Paris, France";
 export const COMPANY_EMAIL = "info@hopstecinnovation.com";
 export const COMPANY_WEBSITE = "https://hopstecinnovation.com";
+export const BRAND_LOGO_SRC = "/logo.png";
+export const BRAND_LOGO_ALT = "Hopstec Innovation";
 
 export const COOKIE_NAME = "app_session_id";
 export const ONE_YEAR_MS = 1000 * 60 * 60 * 24 * 365;

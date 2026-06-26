@@ -3,6 +3,8 @@
  * Handles Web Notifications API for desktop notifications
  */
 
+import { BRAND_LOGO_SRC } from '@shared/const';
+
 export type NotificationPermission = 'default' | 'granted' | 'denied';
 
 export interface BrowserNotificationOptions {
@@ -88,8 +90,8 @@ class NotificationService {
     try {
       const notification = new Notification(options.title, {
         body: options.body,
-        icon: options.icon || '/logo.png',
-        badge: options.badge || '/logo.png',
+        icon: options.icon || BRAND_LOGO_SRC,
+        badge: options.badge || BRAND_LOGO_SRC,
         tag: options.tag,
         data: options.data,
         requireInteraction: options.requireInteraction || false,

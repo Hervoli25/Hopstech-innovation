@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils';
+import { BrandLogo } from '../BrandLogo';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -81,9 +82,7 @@ export const FullScreenLoader = ({ message = 'Loading HOPSTECH Portal...' }: Ful
             
             {/* Inner pulsing logo */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center animate-pulse">
-                <span className="text-white font-bold text-2xl">H</span>
-              </div>
+              <BrandLogo size="md" className="animate-pulse shadow-none ring-0" showRing={false} />
             </div>
           </div>
         </div>

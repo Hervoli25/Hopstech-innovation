@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { BrandLogo } from './BrandLogo';
 import { enterpriseFooter } from '@/content/enterprise';
 import { handleSectionLink } from '@/lib/scrollToSection';
 
@@ -61,12 +62,8 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between md:h-20">
           <Link href="/" className="group flex items-center space-x-3 text-white transition-all hover:opacity-90">
-            <div className="relative">
-              <img
-                src="/logo.png"
-                alt="Hopstec Innovation Logo"
-                className="h-12 w-12 rounded-full bg-white p-0.5 ring-2 ring-[var(--hopstec-teal)]/50 shadow-lg shadow-[var(--hopstec-teal)]/20 transition-all duration-300 group-hover:scale-110"
-              />
+            <div className="relative transition-all duration-300 group-hover:scale-110">
+              <BrandLogo size="md" />
             </div>
             <span className="bg-clip-text text-xl font-bold text-transparent bg-gradient-to-r from-[var(--hopstec-teal)] via-cyan-300 to-blue-400">
               <span className="block max-w-[10rem] text-sm leading-tight sm:max-w-none sm:text-base md:text-xl">

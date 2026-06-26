@@ -27,7 +27,8 @@ const plugins = [
       'android-chrome-72x72.png',
       'pwa-icon-192.png',
       'pwa-icon-512.png',
-      'logo.png'
+      'logo.png',
+      'new_logo.jpeg'
     ],
     manifest: {
       name: 'Hopstec Innovation Client Portal',

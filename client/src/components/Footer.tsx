@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { Github, Linkedin } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
 import { enterpriseFooter } from '@/content/enterprise';
 import { handleSectionLink } from '@/lib/scrollToSection';
 
@@ -25,11 +26,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Link href="/">
               <a className="flex items-center space-x-3 text-white transition-all hover:opacity-90">
-                <img
-                  src="/logo.png"
-                  alt="Hopstec Innovation Logo"
-                  className="h-12 w-12 rounded-full bg-white p-0.5 ring-2 ring-[var(--hopstec-teal)]/50"
-                />
+                <BrandLogo size="md" showRing={false} />
                 <span className="text-xl font-bold text-white">
                   {enterpriseFooter.companyName}
                 </span>
