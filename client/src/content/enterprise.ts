@@ -322,6 +322,44 @@ export const enterpriseCta = {
   href: "/contact",
 };
 
+export const enterpriseCareers = {
+  title: "Careers",
+  headline: "Build software that ships in the real world",
+  intro:
+    "Hopstec Innovation is a Paris-based team building custom platforms, connected products, and regulated HealthTech systems. We hire people who care about craft, accountability, and outcomes — not slide decks.",
+  pathsTitle: "Career paths",
+  pathsIntro: "We grow engineers across the stacks and domains we deliver for clients every day.",
+  paths: [
+    {
+      title: "Full-Stack Engineering",
+      description:
+        "Design and ship web and mobile products with React, Node.js, Django, and PostgreSQL — from architecture through production.",
+    },
+    {
+      title: "DevOps & Infrastructure",
+      description:
+        "Build CI/CD pipelines, container platforms, and cloud deployments that teams can own long after handover.",
+    },
+    {
+      title: "HealthTech & Regulated Systems",
+      description:
+        "Work on clinical-grade data flows, patient privacy, and practitioner integrations in regulated environments.",
+    },
+    {
+      title: "IoT & Embedded",
+      description:
+        "Connect hardware, firmware, MQTT backends, and real-time dashboards for facilities and industrial use cases.",
+    },
+  ],
+  openRolesTitle: "Open roles",
+  openRolesIntro:
+    "We do not always have a live listing, but we are always interested in hearing from strong engineers and builders.",
+  openRolesNote: "No open positions listed right now — send us your profile and we will keep you in mind.",
+  cta: "Send your profile",
+  ctaHref: "/contact",
+  ctaHint: "Include your GitHub, LinkedIn, or portfolio and the path that interests you most.",
+};
+
 export const enterpriseSectionNav = [
   { id: "about", label: "About" },
   { id: "products", label: "Products" },
@@ -382,6 +420,7 @@ export const enterpriseFooter = {
     { label: "About", href: "/#about" },
     { label: "Services", href: "/#services" },
     { label: "Case Studies", href: "/#case-studies" },
+    { label: "Careers", href: "/careers" },
     { label: "Contact", href: "/contact" },
   ],
 };

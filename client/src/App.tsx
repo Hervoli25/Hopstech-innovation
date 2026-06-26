@@ -11,6 +11,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const PortfolioPage = lazy(() => import("./pages/PortfolioPage"));
 const ProjectDetailPage = lazy(() => import("./pages/ProjectDetailPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
+const CareersPage = lazy(() => import("./pages/CareersPage"));
 const AquaPulsePage = lazy(() => import("./pages/AquaPulsePage"));
 const ClientPortalPage = lazy(() => import("./pages/ClientPortalPage"));
 const AuthVerifyPage = lazy(() => import("./pages/AuthVerifyPage"));
@@ -39,6 +40,7 @@ function Router() {
       <Route path={"/portfolio"}>{() => <PortfolioPage />}</Route>
       <Route path={"/portfolio/:slug"}>{() => <ProjectDetailPage />}</Route>
       <Route path={"/contact"}>{() => <ContactPage />}</Route>
+      <Route path={"/careers"}>{() => <CareersPage />}</Route>
       <Route path={"/client-portal/projects/:id"}>{() => <ClientProjectDetailPage />}</Route>
       <Route path={"/client-portal/projects"}>{() => <ProjectsPage />}</Route>
       <Route path={"/client-portal/messages"}>{() => <MessagesPage />}</Route>
