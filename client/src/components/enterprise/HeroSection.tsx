@@ -69,12 +69,27 @@ const HeroSection = () => {
               </Button>
             </Link>
           </div>
+
+          <div className="mt-10 flex flex-wrap justify-center gap-2">
+            {enterpriseHero.techChips.map((chip) => (
+              <Badge
+                key={chip}
+                variant="outline"
+                className="border-slate-700 bg-slate-900/50 px-3 py-1 text-xs text-gray-400"
+              >
+                {chip}
+              </Badge>
+            ))}
+          </div>
         </FadeIn>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 transform animate-bounce">
-        <div className="flex h-10 w-6 justify-center rounded-full border-2 border-gray-400">
-          <div className="mt-2 h-3 w-1 rounded-full bg-gray-400" />
+      <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
+        <span className="text-xs uppercase tracking-[0.2em] text-gray-500">Scroll to explore</span>
+        <div className="animate-bounce">
+          <div className="flex h-10 w-6 justify-center rounded-full border-2 border-[var(--hopstec-teal)]/40">
+            <div className="mt-2 h-3 w-1 rounded-full bg-[var(--hopstec-teal)]/60" />
+          </div>
         </div>
       </div>
     </section>

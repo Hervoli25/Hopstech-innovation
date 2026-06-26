@@ -1,4 +1,5 @@
 import { FadeIn } from "@/components/animations/FadeIn";
+import { AnimatedCounter } from "@/components/animations/AnimatedCounter";
 import { enterpriseMetrics } from "@/content/enterprise";
 
 const MetricsStrip = () => {
@@ -10,11 +11,17 @@ const MetricsStrip = () => {
             {enterpriseMetrics.map((metric) => (
               <div key={metric.label} className="text-center">
                 <p className="text-3xl font-bold text-[var(--hopstec-teal)] md:text-4xl">
-                  {metric.value}
+                  {"static" in metric && metric.static ? (
+                    metric.value
+                  ) : (
+                    <AnimatedCounter
+                      end={metric.value as number}
+                      suffix={"suffix" in metric ? metric.suffix : ""}
+                      duration={1.8}
+                    />
+                  )}
                 </p>
-                <p className="mt-2 text-sm text-gray-400 md:text-base">
-                  {metric.label}
-                </p>
+                <p className="mt-2 text-sm text-gray-400 md:text-base">{metric.label}</p>
               </div>
             ))}
           </div>

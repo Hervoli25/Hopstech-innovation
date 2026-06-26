@@ -1,13 +1,20 @@
 import { useEffect } from 'react';
 import PageLayout from '../components/PageLayout';
 import HeroSection from '../components/enterprise/HeroSection';
+import LogoStrip from '../components/enterprise/LogoStrip';
 import AboutSection from '../components/enterprise/AboutSection';
 import CircuitDivider from '../components/enterprise/CircuitDivider';
+import ProductsSpotlightSection from '../components/enterprise/ProductsSpotlightSection';
 import ServicesSection from '../components/enterprise/ServicesSection';
+import TechStackSection from '../components/enterprise/TechStackSection';
 import CaseStudiesSection from '../components/enterprise/CaseStudiesSection';
+import TestimonialsSection from '../components/enterprise/TestimonialsSection';
 import MetricsStrip from '../components/enterprise/MetricsStrip';
 import HowWeShipSection from '../components/enterprise/HowWeShipSection';
 import ClientVisibilitySection from '../components/enterprise/ClientVisibilitySection';
+import FounderSection from '../components/enterprise/FounderSection';
+import CtaBandSection from '../components/enterprise/CtaBandSection';
+import SectionNav from '../components/enterprise/SectionNav';
 import { scrollToSection } from '../lib/scrollToSection';
 
 const HomePage = () => {
@@ -21,14 +28,23 @@ const HomePage = () => {
 
   return (
     <PageLayout>
+      <SectionNav />
       <HeroSection />
+      <LogoStrip />
       <AboutSection />
       <CircuitDivider />
+      <ProductsSpotlightSection />
       <ServicesSection />
+      <CircuitDivider />
+      <TechStackSection />
       <CaseStudiesSection />
+      <TestimonialsSection />
       <MetricsStrip />
       <HowWeShipSection />
+      <CircuitDivider />
       <ClientVisibilitySection />
+      <FounderSection />
+      <CtaBandSection />
     </PageLayout>
   );
 };

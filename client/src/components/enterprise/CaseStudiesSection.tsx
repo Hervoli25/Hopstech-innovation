@@ -1,3 +1,4 @@
+import ResponsiveShowcaseImage from "@/components/ResponsiveShowcaseImage";
 import { ExternalLink } from "lucide-react";
 import { FadeIn } from "@/components/animations/FadeIn";
 import {
@@ -35,10 +36,20 @@ const CaseStudiesSection = () => {
               <Card
                 className={
                   study.isGuardian
-                    ? "border-slate-700 bg-slate-900/80 text-white"
-                    : "border-slate-800 bg-slate-900/50 text-white"
+                    ? "overflow-hidden border-slate-700 bg-slate-900/80 text-white"
+                    : "overflow-hidden border-slate-800 bg-slate-900/50 text-white"
                 }
               >
+                {study.image && (
+                  <div className="border-b border-slate-800 bg-slate-950/50 p-3">
+                    <ResponsiveShowcaseImage
+                      src={study.image}
+                      alt={study.imageAlt ?? study.title}
+                      sizes="(min-width: 1024px) 896px, 100vw"
+                      className="h-48 w-full rounded-lg object-cover object-top md:h-56"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <div className="mb-3 flex flex-wrap gap-2">
                     {study.tags.map((tag) => (

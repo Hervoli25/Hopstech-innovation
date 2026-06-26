@@ -57,11 +57,11 @@ const ContactPage = () => {
       <section className="pt-32 pb-16 bg-gradient-to-br from-blue-900/20 via-slate-950 to-purple-900/20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--hopstec-teal)] via-cyan-300 to-blue-400">
               Get in Touch
             </h1>
             <p className="text-xl text-gray-300">
-              Have a project in mind? Let's discuss how I can help bring your ideas to life.
+              Have a project in mind? Tell us about your product, platform, or automation challenge — we typically respond within one business day.
             </p>
           </div>
         </div>
@@ -82,25 +82,25 @@ const ContactPage = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <Mail className="h-5 w-5 text-blue-400 mt-1" />
+                    <Mail className="h-5 w-5 text-[var(--hopstec-teal)] mt-1" />
                     <div>
                       <div className="text-sm text-gray-400 mb-1">Email</div>
                       <a
-                        href="mailto:hk@hopstecinnovation.com"
-                        className="text-white hover:text-blue-400 transition-colors"
+                        href={`mailto:${enterpriseFooter.email}`}
+                        className="text-white hover:text-[var(--hopstec-teal)] transition-colors"
                       >
-                        hk@hopstecinnovation.com
+                        {enterpriseFooter.email}
                       </a>
                     </div>
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <Phone className="h-5 w-5 text-blue-400 mt-1" />
+                    <Phone className="h-5 w-5 text-[var(--hopstec-teal)] mt-1" />
                     <div>
                       <div className="text-sm text-gray-400 mb-1">Phone</div>
                       <a
                         href="tel:+33776026688"
-                        className="text-white hover:text-blue-400 transition-colors"
+                        className="text-white hover:text-[var(--hopstec-teal)] transition-colors"
                       >
                         +33 7 76 02 66 88
                       </a>
@@ -108,7 +108,7 @@ const ContactPage = () => {
                   </div>
 
                   <div className="flex items-start space-x-3">
-                    <MapPin className="h-5 w-5 text-blue-400 mt-1" />
+                    <MapPin className="h-5 w-5 text-[var(--hopstec-teal)] mt-1" />
                     <div>
                       <div className="text-sm text-gray-400 mb-1">Headquarters</div>
                       <div className="text-white">{enterpriseFooter.address}</div>
@@ -117,11 +117,11 @@ const ContactPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-blue-600 to-purple-600 border-0">
+              <Card className="border-[var(--hopstec-teal)]/20 bg-gradient-to-br from-[var(--hopstec-teal)]/10 to-blue-600/10 border">
                 <CardContent className="p-6">
                   <h3 className="text-white font-semibold mb-2">Response Time</h3>
-                  <p className="text-blue-100 text-sm">
-                    I typically respond to all inquiries within 24 hours during business days.
+                  <p className="text-gray-300 text-sm">
+                    We respond to all business inquiries within 24 hours on working days.
                   </p>
                 </CardContent>
               </Card>
@@ -131,9 +131,9 @@ const ContactPage = () => {
             <div className="lg:col-span-2">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-white">Send Me a Message</CardTitle>
+                  <CardTitle className="text-white">Send us a message</CardTitle>
                   <CardDescription className="text-gray-400">
-                    Fill out the form below and I'll get back to you as soon as possible
+                    Share your scope, timeline, and goals — our team will follow up promptly
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -144,12 +144,12 @@ const ContactPage = () => {
                         Message Sent Successfully!
                       </h3>
                       <p className="text-gray-400 mb-6">
-                        Thank you for reaching out. I'll get back to you soon.
+                        Thank you for reaching out. Our team will get back to you soon.
                       </p>
                       <Button
                         onClick={() => setIsSubmitted(false)}
                         variant="outline"
-                        className="border-blue-400 text-blue-400 hover:bg-blue-400/10"
+                        className="border-[var(--hopstec-teal)] text-[var(--hopstec-teal)] hover:bg-[var(--hopstec-teal)]/10"
                       >
                         Send Another Message
                       </Button>
@@ -249,14 +249,14 @@ const ContactPage = () => {
                           value={formData.message}
                           onChange={handleChange}
                           className="bg-slate-900 border-slate-700 text-white min-h-[150px]"
-                          placeholder="Tell me about your project..."
+                          placeholder="Tell us about your project, product, or platform needs..."
                         />
                       </div>
 
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                        className="w-full bg-[var(--hopstec-teal)] text-slate-950 hover:bg-[var(--hopstec-teal)]/90"
                         disabled={contactMutation.isPending}
                       >
                         {contactMutation.isPending ? (

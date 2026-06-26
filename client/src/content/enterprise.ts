@@ -22,6 +22,52 @@ export const enterpriseHero = {
   locationTag: "Paris-based. Precision-built.",
   ctaSeeWork: "See our work",
   ctaGetInTouch: "Get in touch",
+  techChips: ["React 19", "Django", "Temporal", "ESP32", "PostgreSQL", "Next.js"],
+};
+
+export const enterpriseTrustedBy = {
+  title: "Built for teams that need software to work in production",
+  clients: [
+    { label: "Semiconductor Manufacturing", sector: "Industrial" },
+    { label: "PRESTIGE by Ekhaya", sector: "Operations" },
+    { label: "HealthTech", sector: "Regulated" },
+    { label: "IoT & Facilities", sector: "Connected Hardware" },
+  ],
+};
+
+export const enterpriseProducts = {
+  title: "Products we build and operate",
+  intro:
+    "Alongside client work, we ship and maintain our own platforms — proof that we practice what we deliver.",
+  items: [
+    {
+      id: "20hecto",
+      name: "20Hecto",
+      tagline: "Precision metabolic nutrition",
+      status: "Live on Google Play",
+      url: "https://app.20hecto.com",
+    },
+    {
+      id: "guardian",
+      name: "Guardian",
+      tagline: "AI threat investigation workspace",
+      status: "Live",
+      url: "https://hopstechguardian.com",
+    },
+    {
+      id: "aquapulse",
+      name: "AquaPulse AP-100",
+      tagline: "Smart water management IoT",
+      status: "Patent filed · CE docs",
+      url: "https://hopstecinnovation.com/aquapulse",
+    },
+  ],
+};
+
+export const enterpriseTechStack = {
+  title: "Technologies we ship with",
+  intro:
+    "Production-grade stacks across web, mobile, infrastructure, and connected devices — chosen for reliability, not trends.",
 };
 
 export const enterpriseAbout = {
@@ -92,6 +138,8 @@ export type EnterpriseCaseStudy = {
   techStack: string;
   deployment?: string;
   url?: string;
+  image?: string;
+  imageAlt?: string;
   isGuardian?: boolean;
   details: CaseStudyDetailSection[];
 };
@@ -110,6 +158,8 @@ export const enterpriseCaseStudies = {
       techStack: "React 19, Node.js, Neon PostgreSQL",
       deployment: "app.20hecto.com",
       url: "https://app.20hecto.com",
+      image: "/showcase/NutriTrack1.png",
+      imageAlt: "20Hecto precision nutrition platform dashboard",
       details: [
         {
           heading: "The Problem",
@@ -137,6 +187,8 @@ export const enterpriseCaseStudies = {
         "A Flask-based internal logistics dashboard that centralised shipment tracking and gave operations teams real-time visibility into every active shipment.",
       techStack: "Python, Flask, PostgreSQL",
       deployment: "Internal deployment",
+      image: "/showcase/Talaria1.png",
+      imageAlt: "Talaria logistics and shipment dashboard",
       details: [
         {
           heading: "The Problem",
@@ -161,6 +213,8 @@ export const enterpriseCaseStudies = {
       techStack: "ESP32, Django, HiveMQ MQTT, Railway",
       deployment: "hopstecinnovation.com",
       url: "https://hopstecinnovation.com/aquapulse",
+      image: "/showcase/AquaDashboard.png",
+      imageAlt: "AquaPulse smart water management dashboard",
       details: [
         {
           heading: "The Problem",
@@ -185,6 +239,8 @@ export const enterpriseCaseStudies = {
       techStack: "Next.js, Prisma, PostgreSQL",
       deployment: "prestigebyekhaya.com",
       url: "https://prestigebyekhaya.com/",
+      image: "/showcase/Ekhaya1.png",
+      imageAlt: "Prestige by Ekhaya car wash management platform",
       details: [
         {
           heading: "The Problem",
@@ -211,6 +267,8 @@ export const enterpriseCaseStudies = {
       deployment: "hopstechguardian.com",
       url: "https://hopstechguardian.com",
       isGuardian: true,
+      image: "/showcase/NP1.png",
+      imageAlt: "Guardian AI threat investigation workspace",
       details: [
         {
           heading: "The Problem",
@@ -238,11 +296,40 @@ export const enterpriseCaseStudies = {
 };
 
 export const enterpriseMetrics = [
-  { value: "5+", label: "Products shipped" },
-  { value: "4", label: "Industry verticals" },
-  { value: "Paris", label: "Headquarters" },
-  { value: "Full-stack", label: "Design to deployment" },
-];
+  { value: 5, suffix: "+", label: "Products shipped" },
+  { value: 4, label: "Industry verticals" },
+  { value: "Paris", label: "Headquarters", static: true },
+  { value: "Full-stack", label: "Design to deployment", static: true },
+] as const;
+
+export const enterpriseTestimonials = {
+  title: "What clients say",
+  intro: "Feedback from teams we have built production systems for.",
+};
+
+export const enterpriseFounder = {
+  name: "Herve Kajingu",
+  role: "Founder & Lead Engineer",
+  bio: "Paris-based. Full-stack from architecture to deployment — accountable for every system Hopstec Innovation ships.",
+  linkedinUrl: "https://linkedin.com/in/herve-kajingu",
+};
+
+export const enterpriseCta = {
+  title: "Ready to build something that lasts?",
+  intro:
+    "Tell us about your product, platform, or automation challenge. We respond within one business day.",
+  cta: "Start a conversation",
+  href: "/contact",
+};
+
+export const enterpriseSectionNav = [
+  { id: "about", label: "About" },
+  { id: "products", label: "Products" },
+  { id: "services", label: "Services" },
+  { id: "case-studies", label: "Work" },
+  { id: "how-we-ship", label: "Process" },
+  { id: "contact", label: "Contact", href: "/contact" },
+] as const;
 
 export const enterpriseHowWeShip = {
   title: "How we ship",
@@ -290,6 +377,7 @@ export const enterpriseFooter = {
   website: COMPANY_WEBSITE.replace(/^https?:\/\//, ""),
   websiteUrl: COMPANY_WEBSITE,
   email: COMPANY_EMAIL,
+  trustLine: "GDPR-aware · HealthTech experience · Paris, FR",
   navLinks: [
     { label: "About", href: "/#about" },
     { label: "Services", href: "/#services" },

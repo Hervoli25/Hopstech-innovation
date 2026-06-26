@@ -83,9 +83,12 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-sm text-gray-400 sm:flex-row">
-          <p>
-            © {currentYear} {enterpriseFooter.companyName}. All rights reserved.
-          </p>
+          <div className="text-center sm:text-left">
+            <p>
+              © {currentYear} {enterpriseFooter.companyName}. All rights reserved.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">{enterpriseFooter.trustLine}</p>
+          </div>
           <div className="flex space-x-4">
             <a
               href="https://github.com/hopstech"
