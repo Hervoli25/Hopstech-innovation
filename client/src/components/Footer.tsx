@@ -3,6 +3,10 @@ import { Github, Linkedin } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { enterpriseFooter } from '@/content/enterprise';
 import { handleSectionLink } from '@/lib/scrollToSection';
+import frenchTechGrandParisLogo from '@/assets/Logo_FT_GrandParis_FondBlanc.png';
+
+const FRENCH_TECH_GRAND_PARIS_URL =
+  'https://www.frenchtech-grandparis.com';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -79,32 +83,50 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-sm text-gray-400 sm:flex-row">
-          <div className="text-center sm:text-left">
-            <p>
-              © {currentYear} {enterpriseFooter.companyName}. All rights reserved.
-            </p>
-            <p className="mt-1 text-xs text-gray-500">{enterpriseFooter.trustLine}</p>
-          </div>
-          <div className="flex space-x-4">
-            <a
-              href="https://github.com/hopstech"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-[var(--hopstec-teal)]"
-              aria-label="GitHub"
-            >
-              <Github className="h-5 w-5" />
-            </a>
-            <a
-              href="https://linkedin.com/in/herve-kajingu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-[var(--hopstec-teal)]"
-              aria-label="LinkedIn"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
+        <div className="mt-8 border-t border-slate-800 pt-8">
+          <a
+            href={FRENCH_TECH_GRAND_PARIS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-auto mb-8 flex w-fit flex-col items-center gap-2 text-center text-xs text-gray-400 transition-opacity hover:opacity-90"
+            aria-label="La French Tech Grand Paris"
+          >
+            <img
+              src={frenchTechGrandParisLogo}
+              alt="La French Tech Grand Paris"
+              height={128}
+              className="h-32 w-auto"
+            />
+            <span>Member of La French Tech Grand Paris</span>
+          </a>
+
+          <div className="flex flex-col items-center justify-between gap-4 text-sm text-gray-400 sm:flex-row">
+            <div className="text-center sm:text-left">
+              <p>
+                © {currentYear} {enterpriseFooter.companyName}. All rights reserved.
+              </p>
+              <p className="mt-1 text-xs text-gray-500">{enterpriseFooter.trustLine}</p>
+            </div>
+            <div className="flex space-x-4">
+              <a
+                href="https://github.com/hopstech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-[var(--hopstec-teal)]"
+                aria-label="GitHub"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+              <a
+                href="https://linkedin.com/in/herve-kajingu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-[var(--hopstec-teal)]"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="h-5 w-5" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
